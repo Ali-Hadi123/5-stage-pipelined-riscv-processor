@@ -6,7 +6,7 @@ module imem_tb;
   int unsigned total_tests = 0;
   int unsigned passed_tests = 0;
   logic default_is_correct;
-  integer word_index;
+  int word_index;
 
   logic [XLEN-1:0] default_pc_addr;
   logic [XLEN-1:0] default_instr;

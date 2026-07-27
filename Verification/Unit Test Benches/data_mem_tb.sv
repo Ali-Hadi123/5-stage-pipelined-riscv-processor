@@ -75,7 +75,6 @@ module dmem_tb;
     mem_write = 0;
     mem_size = MEM_BYTE;
     mem_unsigned = 0;
-    tb_read_data = 0;
 
     $display("STARTING DATA MEMORY TESTING:");
 

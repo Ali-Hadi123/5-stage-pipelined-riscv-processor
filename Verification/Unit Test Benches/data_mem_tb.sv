@@ -6,8 +6,8 @@ module dmem_tb;
   logic [XLEN-1:0] tb_byte_addr;
   logic [XLEN-1:0] tb_wdata;
   logic mem_read, mem_write;
-  mem_size_e mem_size, 
-  logic mem_unsigned,
+  mem_size_e mem_size; 
+  logic mem_unsigned;
   logic [XLEN-1:0] tb_read_data;
 
   int unsigned total_tests = 0;
@@ -91,3 +91,88 @@ module dmem_tb;
     end
     else
       $error("TEST 1 Failed:\nExpected: 32'd12345\n Got: %0d", tb_read_data);
+
+    write_data(32'h0000_000C, 32'hAABB_CCDD, MEM_WORD, 1'b1);  //Setting up a known word for byte-level testing.
+    read_data(32'h0000_000C, MEM_WORD, 1'b1);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'hAABB_CCDD) begin
+      passed_tests++;
+      $display("Passed Test 2");
+    end
+    else
+      $error("Failed Test 2\nExpected: 32'hAABB_CCDD\nGot: %h", tb_read_data);
+ 
+    write_data(32'h0000_000C, 32'h0000_0011, MEM_BYTE, 1'b1);  //Overwriting byte offset 0 only.
+    read_data(32'h0000_000C, MEM_WORD, 1'b1);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'hAABB_CC11) begin
+      passed_tests++;
+      $display("Passed Test 3");
+    end
+    else
+      $error("Failed Test 3\nExpected: 32'hAABB_CC11\nGot: %h", tb_read_data);
+ 
+    write_data(32'h0000_000D, 32'h0000_0022, MEM_BYTE, 1'b1);  //Overwriting byte offset 1 only.
+    read_data(32'h0000_000C, MEM_WORD, 1'b1);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'hAABB_2211) begin
+      passed_tests++;
+      $display("Passed Test 4");
+    end
+    else
+      $error("Failed Test 4\nExpected: 32'hAABB_2211\nGot: %h", tb_read_data);
+ 
+    write_data(32'h0000_000E, 32'h0000_0033, MEM_BYTE, 1'b1);  //Overwriting byte offset 2 only.
+    read_data(32'h0000_000C, MEM_WORD, 1'b1);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'hAA33_2211) begin
+      passed_tests++;
+      $display("Passed Test 5");
+    end
+    else
+      $error("Failed Test 5\nExpected: 32'hAA33_2211\nGot: %h", tb_read_data);
+ 
+    write_data(32'h0000_000F, 32'h0000_0044, MEM_BYTE, 1'b1);  //Overwriting byte offset 3 only.
+    read_data(32'h0000_000C, MEM_WORD, 1'b1);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'h4433_2211) begin
+      passed_tests++;
+      $display("Passed Test 6");
+    end
+    else
+      $error("Failed Test 6\nExpected: 32'h4433_2211\nGot: %h", tb_read_data);
+
+    write_data(32'h0000_0011, 32'h0000_007A, MEM_BYTE, 1'b1);  //Testing a positive byte reads the same signed or unsigned.
+    read_data(32'h0000_0010, MEM_BYTE, 1'b0);
+    total_tests++;
+ 
+    #10;
+ 
+    assert (tb_read_data === 32'h0000_007A) begin
+      passed_tests++;
+      $display("Passed Test 7");
+    end
+    else
+      $error("Failed Test 7\nExpected: 32'h0000_007A\nGot: %h", tb_read_data);
+    
+    //Summary
+    $display("DATA MEMORY TESTING COMPLETE!");
+    $display("Results: %0d/%0d tests passed.", passed_tests, total_tests);
+    $finish;
+  end
+endmodule

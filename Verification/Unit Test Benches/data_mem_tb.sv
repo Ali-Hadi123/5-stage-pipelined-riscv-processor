@@ -59,9 +59,6 @@ module dmem_tb;
     tb_byte_addr = addr;
     mem_size = size;
     mem_unsigned = is_unsigned;
-
-    @(negedge clk);
-    mem_read = 1'b0;
   endtask
 
   initial begin
@@ -157,7 +154,7 @@ module dmem_tb;
       $error("Failed Test 6\nExpected: 32'h4433_2211\nGot: %h", tb_read_data);
 
     write_data(32'h0000_0011, 32'h0000_007A, MEM_BYTE, 1'b1);  //Testing a positive byte reads the same signed or unsigned.
-    read_data(32'h0000_0010, MEM_BYTE, 1'b0);
+    read_data(32'h0000_0011, MEM_BYTE, 1'b0);
     total_tests++;
  
     #10;

@@ -6,7 +6,8 @@ module dmem_tb;
   logic [XLEN-1:0] tb_byte_addr;
   logic [XLEN-1:0] tb_wdata;
   logic mem_read, mem_write;
-  logic mem_size, mem_unsigned;
+  mem_size_e mem_size, 
+  logic mem_unsigned,
   logic [XLEN-1:0] tb_read_data;
 
   int unsigned total_tests = 0;
@@ -28,7 +29,8 @@ module dmem_tb;
   task write_data(
     input logic [XLEN-1:0] addr,
     input logic [XLEN-1:0] data,
-    input logic size, is_unsigned
+    input mem_size_e size, 
+    input logic is_unsigned
   );
 
     @(negedge clk);
@@ -43,3 +45,11 @@ module dmem_tb;
     @(negedge clk);
     mem_write = 1'b0;
   endtask
+
+  task read_data(
+    input logic [XLEN-1:0] addr,
+    input mem_size_e size,
+    input logic is_unsigned
+  );
+
+    

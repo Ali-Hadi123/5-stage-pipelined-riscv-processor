@@ -12,9 +12,9 @@ module top #(
 
   //Fetching Instructions:
 
-  logic [XLEN-1] pc_out;
-  logic [XLEN-1] next_pc;
-  logic [XLEN-1] instr;
+  logic [XLEN-1:0] pc_out;
+  logic [XLEN-1:0] next_pc;
+  logic [XLEN-1:0] instr;
 
   pc u_pc(
     .clk(clk),
@@ -127,7 +127,7 @@ module top #(
   assign reg_write_safe = reg_write & ~illegal_instr; //Ensures reg_write can't accidently be 
                                                       //set to high due to an invalid instruction. 
   regf u_regf(
-    .clk(clk)
+    .clk(clk),
     .rs1(rs1_addr),
     .rs2(rs2_addr),
     .rd(rd_addr),

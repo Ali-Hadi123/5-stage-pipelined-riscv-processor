@@ -23,7 +23,7 @@ module imem_tb;
   logic [XLEN-1:0] init_instr; 
 
   imem #(                         //DUV2: IMEM when memory is initialized.
-    .init_mem("imem_test.hex"),
+    .init_mem("instr_mem_test.hex"),
     .rom_size(16)
   ) duv_init (
     .pc_addr(init_pc_addr),

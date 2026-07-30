@@ -44,7 +44,6 @@ module top_tb;
 
     clk = 0;
     rst = 0;
-    illegal_instr = 0;
 
     #10;
 

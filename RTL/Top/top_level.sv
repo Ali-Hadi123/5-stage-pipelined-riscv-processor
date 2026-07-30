@@ -38,12 +38,12 @@ module top #(
   logic [2:0] funct3;
   logic [6:0] funct7;
 
-  assign op_code = opcode_e'(get_opcode(instr));
-  assign rs1_addr = get_rs1(instr);
-  assign rs2_addr = get_rs2(instr);
-  assign rd_addr = get_rd(instr);
-  assign funct3 = get_funct3(instr);
-  assign funct7 = get_funct7(instr);
+  assign op_code   = opcode_e'(riscv_pkg::get_opcode(instr));
+  assign rs1_addr  = riscv_pkg::get_rs1(instr);
+  assign rs2_addr  = riscv_pkg::get_rs2(instr);
+  assign rd_addr   = riscv_pkg::get_rd(instr);
+  assign funct3    = riscv_pkg::get_funct3(instr);
+  assign funct7    = riscv_pkg::get_funct7(instr);
 
   //Generating Control Signals:
 

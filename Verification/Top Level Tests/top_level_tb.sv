@@ -29,13 +29,15 @@ module top_tb;
     input string test_name
   );
 
-    total_tests++;
-    assert (exp_rdata === duv_arithmatic.u_regf.regs[rn]) begin
-      passed_tests++;
-      $display("Passed %s!", test_name);
+    @(posedge clk) begin
+      total_tests++;
+      assert (exp_rdata === duv_arithmatic.u_regf.regs[rn]) begin
+        passed_tests++;
+        $display("Passed %s!", test_name);
+      end
+      else
+        $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, duv_arithmatic.u_regf.regs[rn]);
     end
-    else
-      $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, duv_arithmatic.u_regf.regs[rn]);
   endtask
 
   initial begin
@@ -43,6 +45,8 @@ module top_tb;
     $dumpvars(0, top_tb);
 
     clk = 0;
+    rst = 1;
+    #10;
     rst = 0;
 
     #10;

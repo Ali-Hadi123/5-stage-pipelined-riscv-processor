@@ -179,7 +179,7 @@ module top #(
 
   pc_src_e pc_src;
 
-  pc_comparator u_pc_comparator(
+  pc_comp u_pc_comp(
     .is_branch(is_branch),
     .branch_taken(branch_taken),
     .is_jal(is_jal),

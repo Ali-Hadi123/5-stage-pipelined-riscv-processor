@@ -81,9 +81,8 @@ module top_tb;
     verify_register(32'd26, 32'd1, "Test 26");
     verify_register(32'd27, 32'd0, "Test 27");
 
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests, total_tests);
     $display("\nARITHMATIC TESTING COMPLETED.\n");
-
-    $display("TESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests, total_tests);
     $finish;
   end
 endmodule

@@ -30,12 +30,12 @@ module top_tb;
   );
 
     total_tests++;
-    assert (exp_rdata === duv_arithmatic.uregf.regs[rn]) begin
+    assert (exp_rdata === duv_arithmatic.u_regf.regs[rn]) begin
       passed_tests++;
       $display("Passed %s!", test_name);
     end
     else
-      $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, duv_arithmatic.uregf.regs[rn]);
+      $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, duv_arithmatic.u_regf.regs[rn]);
   endtask
 
   initial begin

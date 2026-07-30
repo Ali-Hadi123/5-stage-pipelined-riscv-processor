@@ -12,7 +12,7 @@ def bin_to_hex(bin_path, hex_path):
     for i in range(0, len(data), 4):
       word_bytes = data[i:i+4]
       word = int.from_bytes(word_bytes, byteorder="little")
-      out.write(f"{word:08x}\n")
+      file_out.write(f"{word:08x}\n")
 
   print(f"Wrote {len(data) // 4} words to {hex_path}")
 

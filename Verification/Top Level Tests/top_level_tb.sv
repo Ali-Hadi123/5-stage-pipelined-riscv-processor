@@ -81,6 +81,6 @@ module top_tb;
     $display("\nARITHMATIC TESTING COMPLETED.\n");
 
     $display("TESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests, total_tests);
-    $finish
+    $finish;
   end
 endmodule

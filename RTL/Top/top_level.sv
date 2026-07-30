@@ -197,7 +197,7 @@ module top #(
     .result(pc_mux_out)
   );
 
-  logic next_pc_normal;
+  logic [XLEN-1:0] next_pc_normal;
   assign next_pc_normal = {pc_mux_out[XLEN-1:1], 1'b0}; //LSB set to 0 to handle JALR instructions.
 
   assign next_pc = illegal_instr ? pc_out : next_pc_normal; //Freezes the pc in the case of an illegal instruction.

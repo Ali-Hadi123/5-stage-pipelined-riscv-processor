@@ -9,7 +9,7 @@ module top_tb;
 
   top #(
     .ram_size(1024),
-    .rom_size(1024),
+    .rom_size(27),
     .init_mem("arithmatic_test.hex")
   ) duv_arithmatic (
     .clk(clk),

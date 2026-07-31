@@ -1,5 +1,4 @@
 ; Load/Store Instruction Tests
-
 addi x1, x0, 0 ; x1 = 0 (base address)
 addi x2, x0, -1 ; x2 = -1
 sw x2, 0(x1) ; mem word @0 = -1

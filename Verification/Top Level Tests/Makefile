@@ -4,11 +4,13 @@
 # make         -->     buils all .hex files from the .s files.
 # make clean   -->     removes intermediate files.
 
+.SUFFIX:		#Cancels built-in rules from the GNU toolchain.
+
 PREFIX ?= riscv-none-elf-
 
-AS := $(prefix)as                    #Defining variables/shortcuts:
-LD := $(prefix)ld
-OBJCOPY := $(prefix)objcopy
+AS := $(PREFIX)as                    #Defining variables/shortcuts:
+LD := $(PREFIX)ld
+OBJCOPY := $(PREFIX)objcopy
 ASFLAGS := -march=rv32i -mabi=ilp32
 LDFLAGS := -Ttext=0x0
 
@@ -17,10 +19,7 @@ HEXFILES := $(ASMFILES:.s=.hex)
 
 all: $(HEXFILES)
 
-%.clean.s: %.s              #Removes semicolon comments from the .s files.
-	sed 's/;.*//' $< > $@
-
-%.o: %.clean.s
+%.o: %.s
 	$(AS) $(ASFLAGS) -o $@ $<
 
 %.elf: %.o

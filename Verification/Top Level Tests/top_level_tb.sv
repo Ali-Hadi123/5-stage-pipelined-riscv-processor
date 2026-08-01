@@ -82,20 +82,20 @@ module top_tb;
   endtask
 
   task verify_memory(
-    input logic [XLEN-1:0] regs [0:REG_COUNT-1],
-    input logic [REG__ADDR_W-1:0] rn,
+    input logic [XLEN-1:0] ram [0:1023], //ram_size - 1 = 1023
+    input logic [XLEN-1:0] addr,
     input logic [XLEN-1:0] exp_rdata,
     input string test_name
   );
 
     @(posedge clk) begin
       total_tests++;
-      assert (exp_rdata === regs[rn]) begin
+      assert (exp_rdata === ram[addr]) begin
         passed_tests++;
         $display("Passed %s!", test_name);
       end
       else
-        $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, regs[rn]);
+        $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, ram[addr]);
     end
   endtask
   
@@ -109,36 +109,48 @@ module top_tb;
 
     $display("STARTING ARITHMATIC TESTING:\n");
 
-    verify_register(duv_arithmatic.u_regf.regs, 32'd1, 32'd5, "ARTH Test 1");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd2, 32'd3, "ARTH Test 2");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd3, 32'd8, "ARTH Test 3");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd4, 32'd2, "ARTH Test 4");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd5, -32'd1, "ARTH Test 5");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd6, 32'd5, "ARTH Test 6");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd7, 32'd7, "ARTH Test 7");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd8, 32'd6, "ARTH Test 8");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd9, -32'd10, "ARTH Test 9");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd10, 32'd1, "ARTH Test 10");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd11, 32'd0, "ARTH Test 11");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd12, 32'd0, "ARTH Test 12");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd13, 32'd1, "ARTH Test 13");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd14, 32'd1, "ARTH Test 14");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd15, 32'd16, "ARTH Test 15");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd16, 32'd32, "ARTH Test 16");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd17, 32'd8, "ARTH Test 17");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd18, -32'd8, "ARTH Test 18");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd19, -32'd4, "ARTH Test 19");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd20, 32'd8, "ARTH Test 20");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd21, 32'd4, "ARTH Test 21");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd22, -32'd1, "ARTH Test 22");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd23, 32'd1, "ARTH Test 23");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd24, 32'd7, "ARTH Test 24");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd25, 32'd0, "ARTH Test 25");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd26, 32'd1, "ARTH Test 26");
-    verify_register(duv_arithmatic.u_regf.regs, 32'd27, 32'd0, "ARTH Test 27");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd1, 32'd5, "ARTH Test 1");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd2, 32'd3, "ARTH Test 2");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd3, 32'd8, "ARTH Test 3");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd4, 32'd2, "ARTH Test 4");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd5, -32'd1, "ARTH Test 5");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd6, 32'd5, "ARTH Test 6");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd7, 32'd7, "ARTH Test 7");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd8, 32'd6, "ARTH Test 8");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd9, -32'd10, "ARTH Test 9");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd10, 32'd1, "ARTH Test 10");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd11, 32'd0, "ARTH Test 11");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd12, 32'd0, "ARTH Test 12");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd13, 32'd1, "ARTH Test 13");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd14, 32'd1, "ARTH Test 14");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd15, 32'd16, "ARTH Test 15");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd16, 32'd32, "ARTH Test 16");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd17, 32'd8, "ARTH Test 17");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd18, -32'd8, "ARTH Test 18");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd19, -32'd4, "ARTH Test 19");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd20, 32'd8, "ARTH Test 20");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd21, 32'd4, "ARTH Test 21");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd22, -32'd1, "ARTH Test 22");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd23, 32'd1, "ARTH Test 23");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd24, 32'd7, "ARTH Test 24");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd25, 32'd0, "ARTH Test 25");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd26, 32'd1, "ARTH Test 26");
+    verify_register(duv_arithmatic.u_regf.regs, 5'd27, 32'd0, "ARTH Test 27");
 
-    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests, total_tests);
+    int unsigned total_tests_arth = total_tests;
+    int unsigned passed_tests_arth = passed_tests;
+    
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_arth, total_tests_arth);
     $display("\nARITHMATIC TESTING COMPLETED.\n");
+
+    $display("STARTING BRANCH TESTING:\n");
+    
+    assert (duv_branch.u_regf[5'd3] === 32'd37)
+      $display("BRANCH TESTING PSASED!");
+    else
+      $display("BRANCH TESTING FAILED");
+
+    $display("\BRANCH TESTING COMPLETED.\n");
     $finish;
   end
 endmodule

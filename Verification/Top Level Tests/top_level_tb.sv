@@ -65,7 +65,7 @@ module top_tb;
 
   task verify_register(
     input logic [XLEN-1:0] regs [0:REG_COUNT-1],
-    input logic [REG__ADDR_W-1:0] rn,
+    input logic [REG_ADDR_W-1:0] rn,
     input logic [XLEN-1:0] exp_rdata,
     input string test_name
   );

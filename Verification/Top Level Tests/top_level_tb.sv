@@ -145,9 +145,25 @@ module top_tb;
 
     $display("STARTING BRANCH TESTING:\n");
 
-    assert (duv_branch.u_regf.regs[5'd3] === 37) begin
-      $display("\nTESTING COMPLETED\nResults: 7/7 tests passed.");
-      $display("\nBRANCH TESTING COMPLETED.\n");
+    int unsigned total_tests_branch = 7;
+    int unsigned passed_tests_branch = 0;
+    
+    assert ~(duv_branch.u_regf.regs[5'd3] === 37) begin
+      verify_register(duv_arithmatic.u_regf.regs, 5'd31, 32'd1, "TEST BEQ TAKEN");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd30, 32'd1, "TEST BNE");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd29, 32'd1, "TEST BEQ NOT TAKEN");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd28, 32'd1, "TEST BLT");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd27, 32'd1, "TEST BLTU");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd26, 32'd1, "TEST BGE");
+      verify_register(duv_arithmatic.u_regf.regs, 5'd25, 32'd1, "TEST BGEU");
+
+      passed_tests_branch = passed_tests - passed_tests_arth;
     end
-    else begin
-      
+    else
+      passed_tests_branch = 7;
+
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
+    $display("\nBRANCH TESTING COMPLETED.\n");
+    $finish;
+  end
+endmodule

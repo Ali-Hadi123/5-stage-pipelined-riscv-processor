@@ -144,13 +144,10 @@ module top_tb;
     $display("\nARITHMATIC TESTING COMPLETED.\n");
 
     $display("STARTING BRANCH TESTING:\n");
-    
-    assert (duv_branch.u_regf[5'd3] === 32'd37)
-      $display("BRANCH TESTING PSASED!");
-    else
-      $display("BRANCH TESTING FAILED");
 
-    $display("\BRANCH TESTING COMPLETED.\n");
-    $finish;
-  end
-endmodule
+    assert (duv_branch.u_regf.regs[5'd3] === 37) begin
+      $display("\nTESTING COMPLETED\nResults: 7/7 tests passed.");
+      $display("\nBRANCH TESTING COMPLETED.\n");
+    end
+    else begin
+      

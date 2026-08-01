@@ -25,7 +25,7 @@ module top_tb;
 
   top #(
     .ram_size(1024),
-    .rom_size(26),
+    .rom_size(43),
     .init_mem("branch_test.hex")
   ) duv_branch (
     .clk(clk),

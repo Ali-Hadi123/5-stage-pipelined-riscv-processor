@@ -5,11 +5,13 @@ module top_tb;
 
   logic clk;
   logic rst;
-  logic illegal_instr;
+  logic illegal_instr_arth, illegal_instr_branch;
 
   //Counters:
   int unsigned total_tests = 0;
   int unsigned passed_tests = 0;
+  int unsigned total_tests_arth, passed_tests_arth;
+  int unsigned total_tests_branch, passed_tests_branch;
 
   always #5 clk = ~clk;
 
@@ -20,7 +22,7 @@ module top_tb;
   ) duv_arithmatic (
     .clk(clk),
     .rst(rst),
-    .illegal_instr(illegal_instr)
+    .illegal_instr(illegal_instr_arth)
   );
 
   top #(
@@ -30,7 +32,7 @@ module top_tb;
   ) duv_branch (
     .clk(clk),
     .rst(rst),
-    .illegal_instr(illegal_instr)
+    .illegal_instr(illegal_instr_branch)
   );
 
   top #(
@@ -137,25 +139,25 @@ module top_tb;
     verify_register(duv_arithmatic.u_regf.regs, 5'd26, 32'd1, "ARTH Test 26");
     verify_register(duv_arithmatic.u_regf.regs, 5'd27, 32'd0, "ARTH Test 27");
 
-    int unsigned total_tests_arth = total_tests;
-    int unsigned passed_tests_arth = passed_tests;
+    total_tests_arth = total_tests;
+    passed_tests_arth = passed_tests;
     
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_arth, total_tests_arth);
     $display("\nARITHMATIC TESTING COMPLETED.\n");
 
     $display("STARTING BRANCH TESTING:\n");
 
-    int unsigned total_tests_branch = 7;
-    int unsigned passed_tests_branch = 0;
+    total_tests_branch = 7;
+    passed_tests_branch = 0;
     
-    assert ~(duv_branch.u_regf.regs[5'd3] === 37) begin
-      verify_register(duv_arithmatic.u_regf.regs, 5'd31, 32'd1, "TEST BEQ TAKEN");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd30, 32'd1, "TEST BNE");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd29, 32'd1, "TEST BEQ NOT TAKEN");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd28, 32'd1, "TEST BLT");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd27, 32'd1, "TEST BLTU");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd26, 32'd1, "TEST BGE");
-      verify_register(duv_arithmatic.u_regf.regs, 5'd25, 32'd1, "TEST BGEU");
+    assert (~(duv_branch.u_regf.regs[5'd3] === 37)) begin
+      verify_register(duv_branch.u_regf.regs, 5'd31, 32'd1, "TEST BEQ TAKEN");
+      verify_register(duv_branch.u_regf.regs, 5'd30, 32'd1, "TEST BNE");
+      verify_register(duv_branch.u_regf.regs, 5'd29, 32'd1, "TEST BEQ NOT TAKEN");
+      verify_register(duv_branch.u_regf.regs, 5'd28, 32'd1, "TEST BLT");
+      verify_register(duv_branch.u_regf.regs, 5'd27, 32'd1, "TEST BLTU");
+      verify_register(duv_branch.u_regf.regs, 5'd26, 32'd1, "TEST BGE");
+      verify_register(duv_branch.u_regf.regs, 5'd25, 32'd1, "TEST BGEU");
 
       passed_tests_branch = passed_tests - passed_tests_arth;
     end

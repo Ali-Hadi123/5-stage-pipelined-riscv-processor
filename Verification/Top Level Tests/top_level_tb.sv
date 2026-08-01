@@ -95,7 +95,7 @@ module top_tb;
         $display("Passed %s!", test_name);
       end
       else
-        $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, mdata);
+        $error("Failed %s!\nExpected: %0d\nGot: %0d", test_name, exp_rdata, rdata);
     end
   endtask
   

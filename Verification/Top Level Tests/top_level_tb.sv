@@ -12,6 +12,8 @@ module top_tb;
   int unsigned passed_tests = 0;
   int unsigned total_tests_arth, passed_tests_arth;
   int unsigned total_tests_branch, passed_tests_branch;
+  int unsigned total_tests_jump, passed_tests_jump;
+  int unsigned total_tests_load_store, passed_tests_load_store;
 
   always #5 clk = ~clk;
 
@@ -188,6 +190,40 @@ module top_tb;
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);
     $display("\nJUMP TESTING COMPLETED.\n");
     
+    repeat (20) @(posedge clk);
+    
+    $display("STARTING LOAD/STORE TESTING:\n");
+
+    total_tests_load_store = 22;
+    passed_tests_load_store = 0;
+
+    verify_memory(duv_load_store.u_dmem.ram[32'd0], -32'd1, "TEST SW");
+    verify_register(duv_load_store.u_regf.regs[5'd3], -32'd1, "TEST LW");
+    verify_memory(duv_load_store.u_dmem.ram[32'd4], 32'd122, "TEST SB, +ve");
+    verify_register(duv_load_store.u_regf.regs[5'd5], 32'd122, "TEST LB, +ve");
+    verify_register(duv_load_store.u_regf.regs[5'd5], 32'd122, "TEST LBU, +ve");
+    verify_memory(duv_load_store.u_dmem.ram[32'd8], -32'd2, "TEST SB, -ve");
+    verify_register(duv_load_store.u_regf.regs[5'd8], -32'd2, "TEST LB, -ve");
+    verify_register(duv_load_store.u_regf.regs[5'd8], 32'd254, "TEST LBU, -ve");
+    verify_memory(duv_load_store.u_dmem.ram[32'd12], 32'd1023, "TEST SH, +ve");
+    verify_register(duv_load_store.u_regf.regs[5'd11], 32'd1023, "TEST LH, +ve");
+    verify_register(duv_load_store.u_regf.regs[5'd12], 32'd1023, "TEST LHU, +ve");
+    verify_memory(duv_load_store.u_dmem.ram[32'd16], -32'd100, "TEST SH, -ve");
+    verify_register(duv_load_store.u_regf.regs[5'd14], -32'd100, "TEST LH, -ve");
+    verify_register(duv_load_store.u_regf.regs[5'd15], 32'd65436, "TEST LHU, -ve");
+    verify_memory(duv_load_store.u_dmem.ram[32'd20], 32'd11, "TEST SB, byte offset = 0");
+    verify_memory(duv_load_store.u_dmem.ram[32'd21], 32'd22, "TEST SB, byte offset = 1");
+    verify_memory(duv_load_store.u_dmem.ram[32'd22], 32'd33, "TEST SB, byte offset = 2");
+    verify_memory(duv_load_store.u_dmem.ram[32'd23], 32'd44, "TEST SB, byte offset = 3");
+    verify_register(duv_load_store.u_regf.regs[5'd20], 32'd44332211, "TEST LW from offset bytes");
+    verify_memory(duv_load_store.u_dmem.ram[32'd24], 32'd171, "TEST SH, half offset = 0");
+    verify_memory(duv_load_store.u_dmem.ram[32'd26], 32'd205, "TEST SH, half offset = 1");
+    verify_register(duv_load_store.u_regf.regs[5'd23], 32'd205171, "TEST LW from offset halfs");
+
+    passed_tests_load_store = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump);
+
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_load_store, total_tests_load_store);
+    $display("\nLOAD/STORE TESTING COMPLETED.\n");
     $finish;
   end
 endmodule

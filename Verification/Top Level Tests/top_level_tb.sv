@@ -169,6 +169,7 @@ module top_tb;
     else begin
       passed_tests_branch = 7;
       passed_tests = passed_tests + 7;
+      total_tests = total_tests + 7;
     end
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
@@ -188,6 +189,7 @@ module top_tb;
     else begin
       passed_tests_jump = 1;
       passed_tests++;
+      total_tests++;
     end
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);

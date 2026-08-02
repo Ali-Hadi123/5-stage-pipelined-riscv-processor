@@ -72,6 +72,7 @@ module top_tb;
   );
 
     @(posedge clk) begin
+      #1;
       total_tests++;
       assert (exp_rdata === rdata) begin
         passed_tests++;
@@ -89,6 +90,7 @@ module top_tb;
   );
  
     @(posedge clk) begin
+      #1;
       total_tests++;
       assert (exp_rdata === rdata) begin
         passed_tests++;

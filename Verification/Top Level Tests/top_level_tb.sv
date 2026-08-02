@@ -154,7 +154,6 @@ module top_tb;
     $display("STARTING BRANCH TESTING:\n");
 
     total_tests_branch = 7;
-    passed_tests_branch = 0;
     
     assert (~(duv_branch.u_regf.regs[5'd3] === 37)) begin
       verify_register(duv_branch.u_regf.regs[5'd31], 32'd1, "TEST BEQ TAKEN");
@@ -167,9 +166,10 @@ module top_tb;
 
       passed_tests_branch = passed_tests - passed_tests_arth;
     end
-    else
+    else begin
       passed_tests_branch = 7;
-      passed_tests = passed_tests = 7;
+      passed_tests = passed_tests + 7;
+    end
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
     $display("\nBRANCH TESTING COMPLETED.\n");
@@ -179,16 +179,16 @@ module top_tb;
     $display("STARTING JUMP TESTING:\n");
 
     total_tests_jump = 1;
-    passed_tests_jump = 0;
 
     assert (~(duv_jump.u_regf.regs[5'd1] === 1101)) begin
       verify_register(duv_jump.u_regf.regs[5'd10], 32'd8, "TEST JAL");
 
       passed_tests_jump = passed_tests - (passed_tests_arth + passed_tests_branch);
     end
-    else
+    else begin
       passed_tests_jump = 1;
       passed_tests++;
+    end
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);
     $display("\nJUMP TESTING COMPLETED.\n");
@@ -198,7 +198,6 @@ module top_tb;
     $display("STARTING LOAD/STORE TESTING:\n");
 
     total_tests_load_store = 22;
-    passed_tests_load_store = 0;
 
     verify_memory(duv_load_store.u_dmem.ram[32'd0], -32'd1, "TEST SW");
     verify_register(duv_load_store.u_regf.regs[5'd3], -32'd1, "TEST LW");
@@ -232,15 +231,14 @@ module top_tb;
 
     $display("STARTING UPPER IMMEDIATE TESTING:\n");
 
-    total_tests_upper_immediate = 0;
-    passed_tests_upper_immediate = 0;
+    total_tests_upper_immediate = 4;
 
     verify_register(duv_upper_immediate.u_regf.regs[5'd1], 32'h0x00000000, "TEST AUIPC AT 0");
     verify_register(duv_upper_immediate.u_regf.regs[5'd2], 32'h0x00001004, "TEST AUIPC");
     verify_register(duv_upper_immediate.u_regf.regs[5'd3], 32'h0x12345000, "TEST LUI, +ve");
     verify_register(duv_upper_immediate.u_regf.regs[5'd5], 32'h0xFFFFF001, "TEST LUI, -ve");
 
-    passed_tests_load_store = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump + passed_tests_store_load);
+    passed_tests_upper_immediate = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump + passed_tests_store_load);
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_upper_immediate, total_tests_upper_immediate);
     $display("\nUPPER IMMEDIATE TESTING COMPLETED.\n");

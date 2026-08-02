@@ -146,6 +146,8 @@ module top_tb;
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_arth, total_tests_arth);
     $display("\nARITHMATIC TESTING COMPLETED.\n");
 
+    repeat (20) @(posedge clk); //Gives duv_branch time to run all 43 instructions.
+    
     $display("STARTING BRANCH TESTING:\n");
 
     total_tests_branch = 7;
@@ -167,6 +169,10 @@ module top_tb;
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
     $display("\nBRANCH TESTING COMPLETED.\n");
+
+    $display("STARTING JUMP TESTING:\n");
+
+    
     $finish;
   end
 endmodule

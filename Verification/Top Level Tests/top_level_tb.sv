@@ -235,12 +235,12 @@ module top_tb;
 
     total_tests_upper_immediate = 4;
 
-    verify_register(duv_upper_immediate.u_regf.regs[5'd1], 32'h0x00000000, "TEST AUIPC AT 0");
-    verify_register(duv_upper_immediate.u_regf.regs[5'd2], 32'h0x00001004, "TEST AUIPC");
-    verify_register(duv_upper_immediate.u_regf.regs[5'd3], 32'h0x12345000, "TEST LUI, +ve");
-    verify_register(duv_upper_immediate.u_regf.regs[5'd5], 32'h0xFFFFF001, "TEST LUI, -ve");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd1], 32'h00000000, "TEST AUIPC AT 0");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd2], 32'h00001004, "TEST AUIPC");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd3], 32'h12345000, "TEST LUI, +ve");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd5], 32'hFFFFF001, "TEST LUI, -ve");
 
-    passed_tests_upper_immediate = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump + passed_tests_store_load);
+    passed_tests_upper_immediate = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump + passed_tests_load_store);
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_upper_immediate, total_tests_upper_immediate);
     $display("\nUPPER IMMEDIATE TESTING COMPLETED.\n");

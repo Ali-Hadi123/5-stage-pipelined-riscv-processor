@@ -14,6 +14,7 @@ module top_tb;
   int unsigned total_tests_branch, passed_tests_branch;
   int unsigned total_tests_jump, passed_tests_jump;
   int unsigned total_tests_load_store, passed_tests_load_store;
+  int unsigned total_tests_upper_immediate, passed_tests_upper_immediate;
 
   always #5 clk = ~clk;
 
@@ -226,6 +227,26 @@ module top_tb;
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_load_store, total_tests_load_store);
     $display("\nLOAD/STORE TESTING COMPLETED.\n");
+
+    repeat (40) @(posedge clk);
+
+    $display("STARTING UPPER IMMEDIATE TESTING:\n");
+
+    total_tests_upper_immediate = 0;
+    passed_tests_upper_immediate = 0;
+
+    verify_register(duv_upper_immediate.u_regf.regs[5'd1], 32'h0x00000000, "TEST AUIPC AT 0");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd2], 32'h0x00001004, "TEST AUIPC");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd3], 32'h0x12345000, "TEST LUI, +ve");
+    verify_register(duv_upper_immediate.u_regf.regs[5'd5], 32'h0xFFFFF001, "TEST LUI, -ve");
+
+    passed_tests_load_store = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump + passed_tests_store_load);
+
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_upper_immediate, total_tests_upper_immediate);
+    $display("\nUPPER IMMEDIATE TESTING COMPLETED.\n");
+
+    $display("ALL TESTING IS DONE!");
+    $display("RESULTS: %0d/%0d tests passed!", passed_tests, total_tests);
     $finish;
   end
 endmodule

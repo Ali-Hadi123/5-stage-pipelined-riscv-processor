@@ -190,7 +190,7 @@ module top_tb;
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);
     $display("\nJUMP TESTING COMPLETED.\n");
     
-    repeat (20) @(posedge clk);
+    repeat (40) @(posedge clk);
     
     $display("STARTING LOAD/STORE TESTING:\n");
 

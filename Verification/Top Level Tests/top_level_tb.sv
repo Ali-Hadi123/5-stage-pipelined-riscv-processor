@@ -168,6 +168,7 @@ module top_tb;
     end
     else
       passed_tests_branch = 7;
+      passed_tests = passed_tests = 7;
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
     $display("\nBRANCH TESTING COMPLETED.\n");
@@ -186,6 +187,7 @@ module top_tb;
     end
     else
       passed_tests_jump = 1;
+      passed_tests++;
 
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);
     $display("\nJUMP TESTING COMPLETED.\n");
@@ -199,26 +201,26 @@ module top_tb;
 
     verify_memory(duv_load_store.u_dmem.ram[32'd0], -32'd1, "TEST SW");
     verify_register(duv_load_store.u_regf.regs[5'd3], -32'd1, "TEST LW");
-    verify_memory(duv_load_store.u_dmem.ram[32'd4], 32'd122, "TEST SB, +ve");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd1][7:0]}, 32'h0000_007A, "TEST SB, +ve");
     verify_register(duv_load_store.u_regf.regs[5'd5], 32'd122, "TEST LB, +ve");
-    verify_register(duv_load_store.u_regf.regs[5'd5], 32'd122, "TEST LBU, +ve");
-    verify_memory(duv_load_store.u_dmem.ram[32'd8], -32'd2, "TEST SB, -ve");
+    verify_register(duv_load_store.u_regf.regs[5'd6], 32'd122, "TEST LBU, +ve");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd2][7:0]}, 32'h0000_00FE, "TEST SB, -ve");
     verify_register(duv_load_store.u_regf.regs[5'd8], -32'd2, "TEST LB, -ve");
-    verify_register(duv_load_store.u_regf.regs[5'd8], 32'd254, "TEST LBU, -ve");
-    verify_memory(duv_load_store.u_dmem.ram[32'd12], 32'd1023, "TEST SH, +ve");
+    verify_register(duv_load_store.u_regf.regs[5'd9], 32'd254, "TEST LBU, -ve");
+    verify_memory({16'b0, duv_load_store.u_dmem.ram[32'd3][15:0]}, 32'h0000_03FF, "TEST SH, +ve");
     verify_register(duv_load_store.u_regf.regs[5'd11], 32'd1023, "TEST LH, +ve");
     verify_register(duv_load_store.u_regf.regs[5'd12], 32'd1023, "TEST LHU, +ve");
-    verify_memory(duv_load_store.u_dmem.ram[32'd16], -32'd100, "TEST SH, -ve");
+    verify_memory({16'b0, duv_load_store.u_dmem.ram[32'd4][15:0]}, 32'h0000_FF9C, "TEST SH, -ve");
     verify_register(duv_load_store.u_regf.regs[5'd14], -32'd100, "TEST LH, -ve");
     verify_register(duv_load_store.u_regf.regs[5'd15], 32'd65436, "TEST LHU, -ve");
-    verify_memory(duv_load_store.u_dmem.ram[32'd20], 32'd11, "TEST SB, byte offset = 0");
-    verify_memory(duv_load_store.u_dmem.ram[32'd21], 32'd22, "TEST SB, byte offset = 1");
-    verify_memory(duv_load_store.u_dmem.ram[32'd22], 32'd33, "TEST SB, byte offset = 2");
-    verify_memory(duv_load_store.u_dmem.ram[32'd23], 32'd44, "TEST SB, byte offset = 3");
-    verify_register(duv_load_store.u_regf.regs[5'd20], 32'd44332211, "TEST LW from offset bytes");
-    verify_memory(duv_load_store.u_dmem.ram[32'd24], 32'd171, "TEST SH, half offset = 0");
-    verify_memory(duv_load_store.u_dmem.ram[32'd26], 32'd205, "TEST SH, half offset = 1");
-    verify_register(duv_load_store.u_regf.regs[5'd23], 32'd205171, "TEST LW from offset halfs");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd5][7:0]},   32'h0000_0011, "TEST SB, byte offset = 0");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd5][15:8]},  32'h0000_0022, "TEST SB, byte offset = 1");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd5][23:16]}, 32'h0000_0033, "TEST SB, byte offset = 2");
+    verify_memory({24'b0, duv_load_store.u_dmem.ram[32'd5][31:24]}, 32'h0000_0044, "TEST SB, byte offset = 3");
+    verify_register(duv_load_store.u_regf.regs[5'd20], 32'h4433_2211, "TEST LW from offset bytes");
+    verify_memory({16'b0, duv_load_store.u_dmem.ram[32'd6][15:0]},  32'h0000_00AB, "TEST SH, half offset = 0");
+    verify_memory({16'b0, duv_load_store.u_dmem.ram[32'd6][31:16]}, 32'h0000_00CD, "TEST SH, half offset = 1");
+    verify_register(duv_load_store.u_regf.regs[5'd23], 32'h00CD_00AB, "TEST LW from offset halfs");
 
     passed_tests_load_store = passed_tests - (passed_tests_arth + passed_tests_branch + passed_tests_jump);
 

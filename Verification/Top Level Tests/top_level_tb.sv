@@ -170,8 +170,23 @@ module top_tb;
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_branch, total_tests_branch);
     $display("\nBRANCH TESTING COMPLETED.\n");
 
+    repeat (20) @(posedge clk);
+    
     $display("STARTING JUMP TESTING:\n");
 
+    total_tests_jump = 1;
+    passed_tests_jump = 0;
+
+    assert (~(duv_jump.u_regf.regs[5'd1] === 1101)) begin
+      verify_register(duv_jump.u_regf.regs[5'd10], 32'd8, "TEST JAL");
+
+      passed_tests_jump = passed_tests - (passed_tests_arth + passed_tests_branch);
+    end
+    else
+      passed_tests_jump = 1;
+
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_jump, total_tests_jump);
+    $display("\nJUMP TESTING COMPLETED.\n");
     
     $finish;
   end

@@ -21,7 +21,7 @@ module top_tb;
   top #(
     .ram_size(1024),
     .rom_size(27),
-    .init_mem("arithmatic_test.hex")
+    .init_mem("Assembly Programs/arithmatic_test.hex")
   ) duv_arithmatic (
     .clk(clk),
     .rst(rst),
@@ -31,7 +31,7 @@ module top_tb;
   top #(
     .ram_size(1024),
     .rom_size(43),
-    .init_mem("branch_test.hex")
+    .init_mem("Assembly Programs/branch_test.hex")
   ) duv_branch (
     .clk(clk),
     .rst(rst),
@@ -41,7 +41,7 @@ module top_tb;
   top #(
     .ram_size(1024),
     .rom_size(7),
-    .init_mem("jump_test.hex")
+    .init_mem("Assembly Programs/jump_test.hex")
   ) duv_jump (
     .clk(clk),
     .rst(rst),
@@ -51,7 +51,7 @@ module top_tb;
   top #(
     .ram_size(1024),
     .rom_size(34),
-    .init_mem("load_store_test.hex")
+    .init_mem("Assembly Programs/load_store_test.hex")
   ) duv_load_store (
     .clk(clk),
     .rst(rst),
@@ -61,7 +61,7 @@ module top_tb;
   top #(
     .ram_size(1024),
     .rom_size(5),
-    .init_mem("upper_immediate_test.hex")
+    .init_mem("Assembly Programs/upper_immediate_test.hex")
   ) duv_upper_immediate (
     .clk(clk),
     .rst(rst),

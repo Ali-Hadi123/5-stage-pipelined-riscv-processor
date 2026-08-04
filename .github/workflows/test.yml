@@ -1,0 +1,28 @@
+name: RTL Regression Tests
+
+# Runs the full testbench suite (Icarus Verilog) on every push and every PR
+# targeting main, so a broken commit gets flagged automatically instead of
+# silently sitting in the repo.
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+
+jobs:
+  simulate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Icarus Verilog
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y iverilog
+
+      - name: Run RTL regression suite
+        run: |
+          chmod +x ./run_tests.sh
+          ./run_tests.sh

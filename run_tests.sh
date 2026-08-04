@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 #
-# run_tests.sh
-#
-# Compiles and runs every unit testbench plus the full top-level integration
-# testbench for the RISC-V CPU project, using Icarus Verilog.
+# Compiles and runs every unit testbench plus the full top-level testbench using Icarus Verilog.
 #
 # Usage:
 #   ./run_tests.sh
 #
-# Exits 0 if every testbench compiled and every reported "N/M tests passed"
-# had N == M. Exits 1 otherwise (compile error OR any failed assertion),
-# which is what lets CI mark the run red/green.
+# Exits 0 if every testbench passes succesfully.
+# Exits 1 otherwise (compile error OR any failed testbench),
+# Enables CI to mark the run red/green.
 
 set -uo pipefail
 
@@ -28,11 +25,6 @@ mapfile -d '' RTL_SOURCES < <(
   }
 )
 
-# Runs one testbench: compiles it against the full RTL source list, executes
-# it from the given working directory (so relative $readmemh paths resolve),
-# and checks the output for failures.
-#
-# args: <human-readable name> <testbench .sv path> <run directory>
 run_tb () {
   local name="$1"
   local tb_path="$2"
@@ -55,10 +47,6 @@ run_tb () {
   local run_log="$WORKDIR/${name// /_}.run.log"
   ( cd "$run_dir" && vvp "$sim_out" ) | tee "$run_log"
 
-  # A testbench is only considered passing if every "N/M tests passed" line
-  # it printed has N == M, AND it printed at least one such line (a
-  # testbench that silently produces no summary is treated as a failure,
-  # since that usually means something crashed before printing results).
   local ratios
   ratios=$(grep -oE '[0-9]+/[0-9]+ tests passed' "$run_log" || true)
 

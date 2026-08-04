@@ -1,14 +1,13 @@
 name: RTL Regression Tests
 
 # Runs the full testbench suite (Icarus Verilog) on every push and every PR
-# targeting main, so a broken commit gets flagged automatically instead of
-# silently sitting in the repo.
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  workflow_dispatch: {}   # lets you trigger it manually from the Actions tab
+  workflow_dispatch: {}  
 
 jobs:
   simulate:

@@ -116,6 +116,18 @@ package riscv_pkg;
     MEM_WORD
   } mem_size_e;
 
+  typedef enum logic [1:0] {
+    FWD_NONE_A,
+    FWD_WB_A,
+    FWD_MEM_A
+  } fwdA_e;
+
+  typedef enum logic [1:0] {
+    FWD_NONE_B,
+    FWD_WB_B,
+    FWD_MEM_B
+  } fwdB_e;
+
   //Instruction field extraction helpers.
   
   function automatic logic [6:0] get_opcode(input logic [ILEN-1:0] instr);

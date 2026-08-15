@@ -3,8 +3,8 @@ import riscv_pkg::*;
 module fd_reg(
     input logic clk,
     input logic rst,
-    input logic stall,          //en  - 1: capture 'd' on this clock edge. 0: hold current contents (stall).
-    input logic flush,          //clr - 1: synchronously clear to a bubble (flush). Takes priority over en.
+    input logic stall,       
+    input logic flush,         
     input fd_reg_t d_in,
     output fd_reg_t d_out
 );

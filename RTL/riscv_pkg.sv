@@ -116,7 +116,7 @@ package riscv_pkg;
     MEM_WORD
   } mem_size_e;
 
-  // Instruction field extraction helpers.
+  //Instruction field extraction helpers.
   
   function automatic logic [6:0] get_opcode(input logic [ILEN-1:0] instr);
     return instr[6:0];
@@ -158,4 +158,74 @@ package riscv_pkg;
       default:             get_fmt = FMT_I;
     endcase
   endfunction
+
+  //Structs for pipelined registers.
+
+  typedef struct packed {
+    logic [XLEN-1:0] instr;
+    logic [XLEN-1:0] pc;
+    logic [XLEN-1:0] pc_plus4;
+  } fd_reg_t;
+
+  typedef struct packed {
+    logic [XLEN-1:0] pc;
+    logic [XLEN-1:0] pc_plus4;
+    logic [XLEN-1:0] rdata1;
+    logic [XLEN-1:0] rdata2;
+    logic [XLEN-1:0] imm_out;
+    logic [2:0] funct3;
+
+    logic [REG_ADDR_W-1:0] rs1_addr;
+    logic [REG_ADDR_W-1:0] rs2_addr;
+    logic [REG_ADDR_W-1:0] rd_addr;
+    
+    alu_src_e alu_src;
+    logic mem_read;
+    logic mem_write;
+    result_src_e result_src;
+    logic is_branch;
+    logic is_jal;
+    logic is_jalr;
+    logic reg_write;
+    alu_ctrl_e alu_ctrl;
+    mem_size_e mem_size;
+    logic mem_unsigned;
+
+    logic illegal_instr_main;
+    logic illegal_instr_mem;
+    logic illegal_instr_alu;
+  } de_reg_t;
+
+  typedef struct packed {
+    logic [XLEN-1:0] alu_result;
+    logic [XLEN-1:0] write_data;
+    logic [XLEN-1:0] pc_plus4;
+    logic [XLEN-1:0] pc_target;
+
+    logic [REG_ADDR_W-1:0] rd_addr;
+
+    result_src_e result_src;
+    logic mem_read;
+    logic mem_write;
+    mem_size_e mem_size;
+    logic mem_unsigned;
+    logic reg_write;
+
+    logic illegal_instr;
+  } em_reg_t;
+
+  typedef struct packed {
+    logic [XLEN-1:0] mem_rdata;
+    logic [XLEN-1:0] alu_result;
+    logic [XLEN-1:0] pc_plus4;
+    logic [XLEN-1:0] pc_target;
+
+    logic [REG_ADDR_W-1:0] rd_addr;
+
+    logic reg_write;
+    result_src_e result_src;
+
+    logic illegal_instr;
+  } mw_reg_t;
+
 endpackage

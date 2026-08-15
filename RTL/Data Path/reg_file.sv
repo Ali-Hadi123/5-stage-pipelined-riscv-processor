@@ -10,8 +10,8 @@ module regf (
 
   logic [XLEN-1:0] regs [0:REG_COUNT-1];
 
-  assign rdata1 = (rs1 == 0) ? 0 : regs[rs1];
-  assign rdata2 = (rs2 == 0) ? 0 : regs[rs2];
+  assign rdata1 = (reg_write & rd == rs1 & rd != 0) ? wd : (rs1 == 0 ? 0 : regs[rs1]);
+  assign rdata2 = (reg_write & rd == rs2 & rd != 0) ? wd : (rs2 == 0 ? 0 : regs[rs2]);
 
   always_ff @(posedge clk)
     if (reg_write & rd != 0)

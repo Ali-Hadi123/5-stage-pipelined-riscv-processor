@@ -112,6 +112,8 @@ module top_tb;
 
     #10;
 
+    repeat (600) @(posedge clk);
+
     $display("STARTING ARITHMATIC TESTING:\n");
 
     verify_register(duv_arithmatic.u_regf.regs[5'd1], 32'd5, "ARTH Test 1");

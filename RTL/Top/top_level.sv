@@ -35,7 +35,7 @@ module top #(
     ) u_imem(
         .pc_addr(pc_outF),
         .instr(instrF)
-    )
+    );
 
     logic [XLEN-1:0] pc_plus4F;
 

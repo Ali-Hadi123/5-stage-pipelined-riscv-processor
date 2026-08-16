@@ -55,8 +55,8 @@ module top #(
         .rst(rst),
         .stall(stallD),
         .flush(flushD),
-        .fd_in(fd_in),
-        .fd_out(fd_out)
+        .d_in(fd_in),
+        .d_out(fd_out)
     );
 
     //Decode Stage:
@@ -239,13 +239,12 @@ module top #(
     logic illegal_instr_branchE;
 
     branch_decoder u_branch_decoder(
-        .is_branch(de_out.is_branch),
         .funct3(funct3_branch_e'(de_out.funct3)),
-        .alu_zero(alu_zeroE),
-        .alu_less(alu_lessE),
-        .alu_less_u(alu_less_uE),
+        .is_zero(alu_zeroE),
+        .is_less(alu_lessE),
+        .is_less_u(alu_less_uE),
         .branch_taken(branch_takenE),
-        .illegal_instr(illegal_instr_branchE)
+        .illegal_instr_branch(illegal_instr_branchE)
     );
 
     pc_src_e pc_srcE;
@@ -266,7 +265,7 @@ module top #(
         .sum(pc_targetE)
     );
 
-    logic pc_mux_outE;
+    logic [XLEN-1:0] pc_mux_outE;
 
     mux3 #(.WIDTH(XLEN)) u_pc_mux(
         .a(de_out.pc_plus4),

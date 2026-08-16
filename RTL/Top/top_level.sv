@@ -17,14 +17,14 @@ module top #(
 
     //Fetch Stage:
 
-    logic [XLEN-1:0] pc_outF, next_pc;
+    logic [XLEN-1:0] pc_out, next_pc;
 
     pc u_pc(
         .clk(clk),
         .rst(rst),
         .stall(stallF),
         .next_pc(next_pc),
-        .pc_out(pc_outF)
+        .pc_out(pc_out)
     );
 
     logic [XLEN-1:0] instrF;
@@ -33,21 +33,21 @@ module top #(
         .init_mem(init_mem),
         .rom_size(rom_size)
     ) u_imem(
-        .pc_addr(pc_outF),
+        .pc_addr(pc_out),
         .instr(instrF)
     );
 
     logic [XLEN-1:0] pc_plus4F;
 
     adder #(.WIDTH(XLEN)) u_pc_plus4_adder(
-        .a(pc_outF),
+        .a(pc_out),
         .b(XLEN'(4)),
         .sum(pc_plus4F)
     );
 
     fd_reg_t fd_in, fd_out;
     assign fd_in.instr = instrF;
-    assign fd_in.pc = pc_outF;
+    assign fd_in.pc = pc_out;
     assign fd_in.pc_plus4 = pc_plus4F;
 
     fd_reg u_fd_reg(
@@ -293,10 +293,10 @@ module top #(
     //Hazard Unit Logic:
     hzrd_unit u_hzrd_unit(
         .mem_readE(de_out.mem_read),
-        .rs1D(rs1D),
-        .rs2D(rs2D),
+        .rs1D(rs1_addrD),
+        .rs2D(rs2_addrD),
         .rdE(de_out.rd_addr),
-        .pc_srcE(pc_src),
+        .pc_srcE(pc_srcE),
         .stallF(stallF),
         .stallD(stallD),
         .flushD(flushD),

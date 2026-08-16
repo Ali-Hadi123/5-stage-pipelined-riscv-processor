@@ -9,22 +9,22 @@ module fwd_unit(
 );
 
     always_comb begin
-        fwdA_e = FWD_NONE_A;
-        fwdB_e = FWD_NONE_B;
+        fwdA = FWD_NONE_A;
+        fwdB = FWD_NONE_B;
 
         if (((rs1E == rdM) & reg_writeM) & (rs1E != 0))
-            fwdA_e = FWD_MEM_A;
+            fwdA = FWD_MEM_A;
         else if (((rs1E == rdW) & reg_writeW) & (rs1E != 0))
-            fwdA_e = FWD_WB_A;
+            fwdA = FWD_WB_A;
         else
-            fwdA_e = FWD_NONE_A;
+            fwdA = FWD_NONE_A;
 
         if (((rs2E == rdM) & reg_writeM) & (rs2E != 0))
-            fwdB_e = FWD_MEM_B;
+            fwdB = FWD_MEM_B;
         else if (((rs2E == rdW) & reg_writeW) & (rs2E != 0))
-            fwdB_e = FWD_WB_B;
+            fwdB = FWD_WB_B;
         else
-            fwdB_e = FWD_NONE_B;
+            fwdB = FWD_NONE_B;
     end
 
 endmodule

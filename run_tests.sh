@@ -75,7 +75,7 @@ run_tb () {
 }
 
 UNIT_TB_DIR="$ROOT/Verification/Unit Test Benches"
-for tb in alu_tb reg_file_tb imm_gen_tb data_mem_tb instr_mem_tb; do
+for tb in alu_tb reg_file_tb imm_gen_tb data_mem_tb instr_mem_tb hzrd_and_fwd_tb; do
   run_tb "$tb" "$UNIT_TB_DIR/$tb.sv" "$UNIT_TB_DIR"
 done
 

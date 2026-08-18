@@ -8,6 +8,10 @@ module top #(
   input logic clk,
   input logic rst,
   output logic illegal_instr
+
+  output logic [XLEN-1:0] fpga_mem_addr,    //These output ports enable a memory-mapped 
+  output logic [XLEN-1:0] fpga_mem_wdata,   //peripheral (see fpga_top.sv).
+  output logic fpga_mem_write
 );
 
     //Pipeline control signals:
@@ -330,6 +334,10 @@ module top #(
     logic mem_read_safeM, mem_write_safeM;
     assign mem_read_safeM  = em_out.mem_read  & ~em_out.illegal_instr;
     assign mem_write_safeM = em_out.mem_write & ~em_out.illegal_instr;
+
+    assign fpga_mem_addr = em_out.alu_result;
+    assign fpga_mem_wdata = em_out.write_data;
+    assign fpga_mem_write = mem_write_safeM;
 
     logic [XLEN-1:0] mem_read_dataM;
 

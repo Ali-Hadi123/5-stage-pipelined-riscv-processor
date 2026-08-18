@@ -10,7 +10,7 @@ module top #(
   output logic illegal_instr
 
   output logic [XLEN-1:0] fpga_mem_addr,    //These output ports enable a memory-mapped 
-  output logic [XLEN-1:0] fpga_mem_wdata,   //peripheral (see fpga_top.sv).
+  output logic [XLEN-1:0] fpga_mem_wdata,   //peripheral (see fpga_top.sv file).
   output logic fpga_mem_write
 );
 

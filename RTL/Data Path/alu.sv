@@ -5,9 +5,6 @@ module alu (
   input [XLEN-1:0] a,
   input [XLEN-1:0] b,
   output logic [XLEN-1:0] result,
-  output logic is_zero,
-  output logic is_less,
-  output logic is_less_u
 );
 
   logic [XLEN-1:0] sum;
@@ -36,9 +33,5 @@ module alu (
       default: result = '0;
     endcase
   end
-
-  assign is_zero = (result == '0);
-  assign is_less = ($signed(a) < $signed(b));
-  assign is_less_u = (a < b);
 
 endmodule

@@ -234,9 +234,6 @@ module top #(
         .a(fwd_rdata1E),
         .b(alu_bE),
         .result(alu_resultE),
-        .is_zero(alu_zeroE),
-        .is_less(alu_lessE),
-        .is_less_u(alu_less_uE)
     );
 
     logic branch_takenE;
@@ -244,9 +241,8 @@ module top #(
 
     branch_decoder u_branch_decoder(
         .funct3(funct3_branch_e'(de_out.funct3)),
-        .is_zero(alu_zeroE),
-        .is_less(alu_lessE),
-        .is_less_u(alu_less_uE),
+        .a(fwd_rdata1E),
+        .b(alu_bE),
         .branch_taken(branch_takenE),
         .illegal_instr_branch(illegal_instr_branchE)
     );

@@ -8,12 +8,12 @@ module branch_decoder (
   output logic illegal_instr_branch
 );
 
+  logic is_zero;
+  logic is_less;
+  logic is_less_u;
+
   always_comb begin
     illegal_instr_branch = 1'b0;
-
-    logic is_zero;
-    logic is_less;
-    logic is_less_u;
 
     assign is_zero = (a == b);
     assign is_less = ($signed(a) < $signed(b));

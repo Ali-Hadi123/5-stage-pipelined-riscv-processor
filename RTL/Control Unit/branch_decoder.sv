@@ -15,9 +15,9 @@ module branch_decoder (
   always_comb begin
     illegal_instr_branch = 1'b0;
 
-    assign is_zero = (a == b);
-    assign is_less = ($signed(a) < $signed(b));
-    assign is_less_u = (a < b);
+    is_zero = (a == b);
+    is_less = ($signed(a) < $signed(b));
+    is_less_u = (a < b);
     
     unique case(funct3)
         F3_BEQ:  branch_taken = is_zero;

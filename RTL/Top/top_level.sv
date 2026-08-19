@@ -233,7 +233,7 @@ module top #(
         .alu_ctrl(de_out.alu_ctrl),
         .a(fwd_rdata1E),
         .b(alu_bE),
-        .result(alu_resultE),
+        .result(alu_resultE)
     );
 
     logic branch_takenE;

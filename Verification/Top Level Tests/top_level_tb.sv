@@ -113,6 +113,7 @@ module top_tb;
     #10;
 
     repeat (600) @(posedge clk);
+    #1;
 
     $display("STARTING ARITHMATIC TESTING:\n");
 
@@ -151,7 +152,8 @@ module top_tb;
     $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_arth, total_tests_arth);
     $display("\nARITHMATIC TESTING COMPLETED.\n");
 
-    repeat (600) @(posedge clk); //Gives duv_branch time to run all 43 instructions.
+    repeat (600) @(posedge clk);
+    #1;
     
     $display("STARTING BRANCH TESTING:\n");
 
@@ -178,6 +180,7 @@ module top_tb;
     $display("\nBRANCH TESTING COMPLETED.\n");
 
     repeat (600) @(posedge clk);
+    #1;
     
     $display("STARTING JUMP TESTING:\n");
 
@@ -198,6 +201,7 @@ module top_tb;
     $display("\nJUMP TESTING COMPLETED.\n");
     
     repeat (600) @(posedge clk);
+    #1;
     
     $display("STARTING LOAD/STORE TESTING:\n");
 
@@ -232,6 +236,7 @@ module top_tb;
     $display("\nLOAD/STORE TESTING COMPLETED.\n");
 
     repeat (600) @(posedge clk);
+    #1;
 
     $display("STARTING UPPER IMMEDIATE TESTING:\n");
 

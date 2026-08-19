@@ -3,7 +3,7 @@ import riscv_pkg::*;
 module fpga_top #(
     parameter int unsigned ram_size = 1024,
     parameter int unsigned rom_size = 39,
-    parameter init_mem = "uart_test.hex"
+    parameter init_mem = "uart_test.hex",
     parameter int unsigned CLKS_PER_BIT = 10417 
 )(
     input logic clk,
@@ -44,7 +44,7 @@ module fpga_top #(
     logic uart_busy;
 
     uart_tx #(
-        .CLKS_PER_BIT(CLKS_PET_BIT)
+        .CLKS_PER_BIT(CLKS_PER_BIT)
     ) u_uart (
         .clk(clk),
         .rst(rst),

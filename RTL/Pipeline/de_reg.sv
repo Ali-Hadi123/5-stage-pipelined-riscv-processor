@@ -18,6 +18,10 @@ module de_reg(
       d_out.illegal_instr_main  <= 1'b0;
       d_out.illegal_instr_mem   <= 1'b0;
       d_out.illegal_instr_alu   <= 1'b0;
+
+      d_out.is_branch           <= 1'b0;
+      d_out.is_jal              <= 1'b0;
+      d_out.is_jalr             <= 1'b0;
     end
   end
   

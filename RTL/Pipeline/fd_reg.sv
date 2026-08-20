@@ -10,7 +10,7 @@ module fd_reg(
 );
 
   function automatic fd_reg_t bubble();
-    bubble.instr    = 32'h0000_0013;     //NOP machine code.
+    bubble.instr    = 32'h0000_0013;     //NOP machine code
     bubble.pc       = '0;
     bubble.pc_plus4 = '0;
   endfunction

@@ -33,7 +33,7 @@ module main_decoder (
     imm_src    = FMT_I;          // Doesn't matter unless ALUSrc=1
     reg_write  = 1'b0;           // Don't write registers
     alu_op     = ALUOP_ADD;      // Default ALU operation (typically ADD)
-    illegal_instr_main = 1'b1;       // Assumes invalid instruction
+    illegal_instr_main = 1'b1;   // Assumes invalid instruction
     
     unique case(op_code)
       OP_ARTH_REG: begin
@@ -144,8 +144,8 @@ module main_decoder (
       //Although allowing fence and system instructions to be handled by the default would not alter 
       //functionality, seperating them allows for the true, illegal instructions to be more easily flagged.
       
-      OP_FENCE: ;  
-      OP_SYSTEM: ; 
+      OP_FENCE: illegal_instr_main = 1'b0; 
+      OP_SYSTEM: illegal_instr_main = 1'b0;
 
       default: illegal_instr_main = 1'b1;
     endcase

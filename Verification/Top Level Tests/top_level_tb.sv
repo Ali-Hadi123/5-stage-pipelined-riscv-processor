@@ -30,7 +30,7 @@ module top_tb;
 
   top #(
     .ram_size(1024),
-    .rom_size(43),
+    .rom_size(64),
     .init_mem("Assembly Programs/branch_test.hex")
   ) duv_branch (
     .clk(clk),

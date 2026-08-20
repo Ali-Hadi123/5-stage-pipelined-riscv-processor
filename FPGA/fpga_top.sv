@@ -30,7 +30,7 @@ module fpga_top #(
         .rst(rst),
         .illegal_instr(illegal_instr),
         .fpga_mem_addr(fpga_mem_addr),
-        .fpga_mem_wdata(fpg_mem_wdata),
+        .fpga_mem_wdata(fpga_mem_wdata),
         .fpga_mem_write(fpga_mem_write)
     );
 

@@ -39,12 +39,12 @@ module de_reg(
 
   always_ff @(posedge clk or posedge rst) begin
     if (rst | flush) begin
-      bubble.mem_read            = 1'b0;
-      bubble.mem_write           = 1'b0;
-      bubble.reg_write           = 1'b0;
-      bubble.illegal_instr_main  = 1'b0;
-      bubble.illegal_instr_mem   = 1'b0;
-      bubble.illegal_instr_alu   = 1'b0;
+      d_out.mem_read            = 1'b0;
+      d_out.mem_write           = 1'b0;
+      d_out.reg_write           = 1'b0;
+      d_out.illegal_instr_main  = 1'b0;
+      d_out.illegal_instr_mem   = 1'b0;
+      d_out.illegal_instr_alu   = 1'b0;
     end
     else
         d_out <= d_in;

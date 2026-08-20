@@ -15,11 +15,18 @@ module fd_reg(
     bubble.pc_plus4 = '0;
   endfunction
 
-  always_ff @(posedge clk or posedge rst) begin
-    if (rst | flush)
+always_ff @(posedge clk or posedge rst) begin
+    if (rst)
         d_out <= bubble();
+
+    else if (flush) begin
+        d_out.pc       <= d_in.pc;
+        d_out.pc_plus4 <= d_in.pc_plus4;
+        d_out.instr    <= 32'h0000_0013;
+    end
+
     else if (~stall)
         d_out <= d_in;
-  end
+end
 
 endmodule

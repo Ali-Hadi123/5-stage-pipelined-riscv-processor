@@ -8,24 +8,16 @@ module branch_decoder (
   output logic illegal_instr_branch
 );
 
-  logic is_zero;
-  logic is_less;
-  logic is_less_u;
-
   always_comb begin
     illegal_instr_branch = 1'b0;
-
-    is_zero = (a == b);
-    is_less = ($signed(a) < $signed(b));
-    is_less_u = (a < b);
     
     unique case(funct3)
-        F3_BEQ:  branch_taken = is_zero;
-        F3_BNE:  branch_taken = ~is_zero;
-        F3_BLT:  branch_taken = is_less;
-        F3_BGE:  branch_taken = ~is_less;
-        F3_BLTU: branch_taken = is_less_u;
-        F3_BGEU: branch_taken = ~is_less_u;
+        F3_BEQ:  branch_taken = (a == b);
+        F3_BNE:  branch_taken = ~(a == b);
+        F3_BLT:  branch_taken = ($signed(a) < $signed(b));
+        F3_BGE:  branch_taken = ~($signed(a) < $signed(b));
+        F3_BLTU: branch_taken = (a < b);
+        F3_BGEU: branch_taken = ~(a < b);
         
         default: begin
           branch_taken = 1'b0;

@@ -38,6 +38,8 @@ module de_reg(
   endfunction
 
   always_ff @(posedge clk or posedge rst) begin
+    d_out <= d_in;
+    
     if (rst | flush) begin
       d_out.mem_read            = 1'b0;
       d_out.mem_write           = 1'b0;
@@ -46,8 +48,6 @@ module de_reg(
       d_out.illegal_instr_mem   = 1'b0;
       d_out.illegal_instr_alu   = 1'b0;
     end
-    else
-        d_out <= d_in;
   end
   
 endmodule

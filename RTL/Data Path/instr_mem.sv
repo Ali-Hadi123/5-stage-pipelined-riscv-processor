@@ -19,6 +19,8 @@ module imem #(
       $readmemh(init_mem, rom); //Overwrites NOP instructions with words from the hex file.
   end
 
-  assign instr = rom[pc_addr[$clog2(rom_size)+1:2]];  //Dividing values by 4 as rom is word alligned and not byte alligned.
+  logic [$clog2(rom_size)-1:0] windex;
+  assign windex = pc_addr[$clog2(rom_size)+1:2]; 
+  assign instr = (windex < rom_size) ? rom[windex] : 32'h0000_0013;
   
 endmodule

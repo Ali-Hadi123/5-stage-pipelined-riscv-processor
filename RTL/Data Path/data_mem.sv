@@ -21,10 +21,13 @@ module dmem #(
   logic [1:0] byte_off;
   assign byte_off = byte_addr[1:0];
 
+  logic windex_valid;
+  assign windex_valid = (windex < ram_size);
+
   //Code for writing data (store instructions):
 
   always_ff @(posedge clk) begin
-    if (mem_write) begin
+    if (mem_write & windex_valid) begin
       unique case(mem_size)
         MEM_BYTE: begin
           unique case(byte_off)
@@ -55,7 +58,7 @@ module dmem #(
   logic [7:0] rbyte;
 
   always_comb begin
-    rword = ram[windex];
+    rword = windex_valid ? ram[windex] : '0;
     
     unique case(byte_off)
       2'b00: rbyte = rword[7:0];

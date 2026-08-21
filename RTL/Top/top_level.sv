@@ -58,7 +58,7 @@ module top #(
         .clk(clk),
         .rst(rst),
         .stall(stallD),
-        .flush(flushD),
+        .flush(flushD || flush_end),
         .d_in(fd_in),
         .d_out(fd_out)
     );
@@ -177,7 +177,7 @@ module top #(
     de_reg u_de_reg(
         .clk(clk),
         .rst(rst),
-        .flush(flushE),
+        .flush(flushE || flush_end),
         .d_in(de_in),
         .d_out(de_out)
     );
@@ -280,10 +280,11 @@ module top #(
     
     //Freeze PC in case of illegal instruction:
     assign next_pc = halt ? pc_out : next_pc_normal;
-    assign flushD = halt ? 1'b1 : 1'b0;
-    assign flushE = halt ? 1'b1 : 1'b0;
 
     assign illegal_instr = de_out.illegal_instr_main | de_out.illegal_instr_alu | de_out.illegal_instr_mem | (de_out.is_branch & illegal_instr_branchE);
+
+    logic flush_end;
+    assign flush_end = halt ? 1'b1 : 1'b0;
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst)

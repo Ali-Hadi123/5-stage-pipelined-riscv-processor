@@ -280,6 +280,8 @@ module top #(
     
     //Freeze PC in case of illegal instruction:
     assign next_pc = halt ? pc_out : next_pc_normal;
+    assign flushD = halt ? 1'b1 : 1'b0;
+    assign flushE = halt ? 1'b1 : 1'b0;
 
     assign illegal_instr = de_out.illegal_instr_main | de_out.illegal_instr_alu | de_out.illegal_instr_mem | (de_out.is_branch & illegal_instr_branchE);
 

@@ -268,7 +268,7 @@ module top #(
     logic [XLEN-1:0] pc_mux_outE;
 
     mux3 #(.WIDTH(XLEN)) u_pc_mux(
-        .a(de_out.pc_plus4),
+        .a(pc_plus4F),
         .b(pc_targetE),
         .c(alu_resultE),
         .sel(pc_srcE),

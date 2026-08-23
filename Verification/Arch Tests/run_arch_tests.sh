@@ -21,7 +21,7 @@ CC="${PREFIX}gcc"
 OBJCOPY="${PREFIX}objcopy"
 NM="${PREFIX}nm"
 
-TEST_SRC_DIR="$ARCH_TEST_DIR/riscv-test-suite/rv32i_m/I/src"
+TEST_SRC_DIR="$ARCH_TEST_DIR/riscv-test-suite/rv32i/I"
 ENV_DIR="$ARCH_TEST_DIR/riscv-test-suite/env"
 
 WORKDIR="$(mktemp -d)"

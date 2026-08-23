@@ -33,7 +33,7 @@ jobs:
 
       - name: Clone riscv-arch-test (RV32I subset only, used below)
         run: |
-          git clone --depth 1 https://github.com/riscv-non-isa/riscv-arch-test.git /tmp/riscv-arch-test/tests/rv32i/I
+          git clone --depth 1 https://github.com/riscv-non-isa/riscv-arch-test.git /tmp/riscv-arch-test
 
       - name: Run RV32I architecture tests
         env:

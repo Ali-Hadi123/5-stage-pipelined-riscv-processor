@@ -9,6 +9,18 @@
       "len": 32,
       "value": "0x0"
     },
+    // No CSR file on this core, so mcounteren/scounteren don't exist and
+    // these values are ignored - left as all-zero (no writable bits)
+    // rather than the upstream template's all-ones default, to match
+    // "nothing is configurable because nothing exists" for this DUT.
+    "mcounteren_writable_bits": {
+      "len": 32,
+      "value": "0x0"
+    },
+    "scounteren_writable_bits": {
+      "len": 32,
+      "value": "0x0"
+    },
     // No CSR file / trap mechanism on this core (main_decoder.sv treats
     // OP_SYSTEM as a legal no-op), so none of these ever fire.
     "xtval_nonzero": {
@@ -32,11 +44,74 @@
       "fcsr_rm": "Fcsr_RM_Illegal",
       "pmpcfg_write_only": "PMP_ClearPermissions",
       "xenvcfg_cbie": "Xenvcfg_ClearPermissions",
+      // No mtvec/stvec CSR on this core, so xtvec[Mode] can never be
+      // written to a reserved value in the first place; this is present
+      // only to satisfy the schema and is never exercised.
+      "xtvec_mode": "Xtvec_Ignore",
       "rv32zdinx_odd_register": "Zdinx_Illegal"
-    }
+    },
+    // No mstatus CSR on this core - FS/VS don't exist, so "Off" (the
+    // most restrictive legal option) best reflects that neither F nor V
+    // is implemented here.
+    "mstatus": {
+      "fs_legal_states": "ExtContext_Off",
+      "vs_legal_states": "ExtContext_Off"
+    },
+    // No mtvec CSR on this core; both modes are marked supported purely
+    // to satisfy "at least one mode must be supported" - never actually
+    // read or written since the CSR doesn't exist.
+    "mtvec": {
+      "direct": {
+        "supported": true,
+        "base_alignment": 2
+      },
+      "vectored": {
+        "supported": true,
+        "base_alignment": 2
+      }
+    },
+    // No S-mode / stvec CSR on this core; present only because the
+    // schema requires it unconditionally.
+    "stvec": {
+      "direct": {
+        "supported": true
+      },
+      "vectored": {
+        "supported": true,
+        "base_alignment": 2
+      }
+    },
+    // No S-mode on this core, so medeleg/mideleg don't exist and these
+    // delegatable-bit masks are never consulted.
+    "medeleg": {
+      "delegatable_bits": {
+        "len": 64,
+        "value": "0x0"
+      }
+    },
+    "mideleg": {
+      "delegatable_bits": {
+        "len": 32,
+        "value": "0x0"
+      }
+    },
+    // Doesn't matter which privileged-ISA version is named since this
+    // core has no privileged architecture (no CSRs, no modes below M).
+    "privileged_isa_version": "Privileged_ISA_1_13"
   },
   "memory": {
-    // No PMP on this core (NUM_PMP_ENTRIES: 0 in the UDB config).
+    // No PMP at all - the alignment/mode support flags below are only valid
+    // when NUM_PMP_ENTRIES > 0, so they're omitted entirely rather than set
+    // to false.
+    "physaddr_bits": 32,
+    // Address to (hypothetically) write a DTB to; this core never boots
+    // an OS image so no DTB is ever generated, but the address must
+    // still land inside a legal memory region - it falls inside the
+    // combined RAM/ROM region below.
+    "dtb_address": {
+      "len": 64,
+      "value": "0x1000"
+    },
     "pmp": {
       "grain": 0,
       "count": 0,
@@ -45,10 +120,10 @@
       "na4_supported": false,
       "napot_supported": false
     },
-    // dmem.sv does byte/half/word accesses with no alignment check and
-    // never faults on misalignment (MISALIGNED_LDST: true in the UDB
-    // config) - it just may not merge correctly across a word boundary,
-    // which the ACTs are aware of.
+    // dmem.sv (RTL/Data Path/data_mem.sv) does byte/half/word accesses via
+    // byte_addr with no alignment check, so misaligned loads/stores don't
+    // fault - they just don't correctly merge across a word boundary. No
+    // exception is ever raised for them either way.
     "misaligned": {
       "supported": true,
       "byte_by_byte": false,
@@ -59,24 +134,18 @@
       "dirty_update": false
     },
     "regions": [
-      // Single flat 128KB region covering the whole address space this
-      // core's `top` module exposes. imem and dmem are physically
-      // separate arrays in the RTL (Harvard-style), but both are
-      // addressed starting at 0x0 with the same size (see
-      // act4_test_tb.sv: ram_size = rom_size = 32768 words), so from
-      // the reference model's point of view there is one logical
-      // 0x0-0x1FFFF address space that is both executable and
-      // read/write data memory.
+
       {
         "base": {
-          "len": 32,
+          "len": 64,
           "value": "0x0"
         },
         "size": {
-          "len": 32,
+          "len": 64,
           "value": "0x50000"
         },
         "attributes": {
+          "mem_type": "MainMemory",
           "cacheable": true,
           "coherent": true,
           "executable": true,
@@ -84,9 +153,20 @@
           "writable": true,
           "read_idempotent": true,
           "write_idempotent": true,
-          "misaligned_fault": "NoFault",
+          "misaligned_exceptions": {
+            "load_store": { "None": null },
+            "vector": { "None": null },
+            "amo": { "None": null }
+          },
+          // No atomic extensions (A/Zaamo/Zalrsc) implemented on this core.
+          "atomic_support": "AMONone",
+          "misaligned_atomicity_granule_size_exp": 0,
+          "vector_misaligned_atomicity_granule_size_exp": 0,
           "reservability": "RsrvNone",
-          "supports_cbo_zero": false
+          "supports_cbo_zero": false,
+          // No paging (no Sv32) on this core.
+          "supports_pte_read": false,
+          "supports_pte_write": false
         },
         "include_in_device_tree": true
       },
@@ -97,14 +177,15 @@
       // alias real DUT memory.
       {
         "base": {
-          "len": 32,
+          "len": 64,
           "value": "0x02000000"
         },
         "size": {
-          "len": 32,
+          "len": 64,
           "value": "0x00100000"
         },
         "attributes": {
+          "mem_type": "IOMemory",
           "cacheable": false,
           "coherent": true,
           "executable": false,
@@ -112,9 +193,18 @@
           "writable": true,
           "read_idempotent": false,
           "write_idempotent": false,
-          "misaligned_fault": "AlignmentFault",
+          "misaligned_exceptions": {
+            "load_store": { "Some": "AlignmentException" },
+            "vector": { "Some": "AlignmentException" },
+            "amo": { "Some": "AlignmentException" }
+          },
+          "atomic_support": "AMONone",
+          "misaligned_atomicity_granule_size_exp": 0,
+          "vector_misaligned_atomicity_granule_size_exp": 0,
           "reservability": "RsrvNone",
-          "supports_cbo_zero": false
+          "supports_cbo_zero": false,
+          "supports_pte_read": false,
+          "supports_pte_write": false
         },
         "include_in_device_tree": false
       }
@@ -126,7 +216,14 @@
     "impid": 0,
     "hartid": 0,
     "cache_block_size_exp": 6,
-    "reservation_set_size_exp": 2,
+    // Replaces the old flat "reservation_set_size_exp" field, which the
+    // schema now nests under "reservation". No LR/SC (A/Zalrsc) on this
+    // core, so these values are never actually consulted.
+    "reservation": {
+      "reservation_set_size_exp": 2,
+      "require_exact_reservation_addr": false,
+      "invalidate_on_same_hart_store": false
+    },
     // No CLINT/timer/interrupts on this core, but the ACT4 framework
     // requires this Sail device enabled (supported: true) unconditionally
     // for signature generation, even though the DUT never uses it. Placed
@@ -147,7 +244,12 @@
     },
     "clock_frequency": 1000000000,
     "instructions_per_tick": 2,
-    "wfi_is_nop": true
+    "wfi_is_nop": true,
+    // No User mode on this core, so this is moot either way.
+    "wfi_available_to_user_mode": false,
+    // Only relevant to WFI/WRS.* timeouts; this core doesn't implement
+    // those semantics beyond wfi_is_nop above, so the value is unused.
+    "max_time_to_wait": 10
   },
   "extensions": {
     // Only base RV32I is implemented - everything below is off to match
@@ -171,6 +273,7 @@
     "Zicboz": { "supported": false },
     "Zic64b": { "supported": false },
     "Zicfilp": { "supported": false },
+    "Zicfiss": { "supported": false },
     "Zicond": { "supported": false },
     "Zicntr": { "supported": false },
     "Zicsr": { "supported": false },

@@ -17,13 +17,13 @@ OUTPUT_ARCH("riscv")
 ENTRY(rvtest_entry_point)
 
 RAM_ORIGIN = 0x00000000;
-RAM_LENGTH = 0x00020000;   /* 128KB */
+RAM_LENGTH = 0x00030000;   /* 192KB */
 TEST_BASE  = RAM_ORIGIN;
 NUM_HARTS  = 1;
 
 MEMORY
 {
-  ram (rwx) : ORIGIN = 0x00000000, LENGTH = 0x00020000  /* must equal RAM_ORIGIN/RAM_LENGTH above */
+  ram (rwx) : ORIGIN = 0x00000000, LENGTH = 0x00030000  /* must equal RAM_ORIGIN/RAM_LENGTH above */
 }
 
 STACK_SIZE = 0x1000;   /* 4KB - conservative given this core's small RAM; grow if tests fault on stack use */

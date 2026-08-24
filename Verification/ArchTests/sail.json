@@ -74,7 +74,7 @@
         },
         "size": {
           "len": 32,
-          "value": "0x20000"
+          "value": "0x30000"
         },
         "attributes": {
           "cacheable": true,

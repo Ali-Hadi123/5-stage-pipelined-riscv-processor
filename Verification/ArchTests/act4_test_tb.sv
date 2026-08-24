@@ -14,8 +14,8 @@
 
 module act4_test_tb;
 
-  localparam int unsigned RAM_SIZE = 32768;   // words -> 128KB, must match link.ld RAM_LENGTH
-  localparam int unsigned ROM_SIZE = 32768;
+  localparam int unsigned RAM_SIZE = 49152;   // words -> 192KB, must match link.ld RAM_LENGTH
+  localparam int unsigned ROM_SIZE = 49152;
   localparam int unsigned HALT_WORD_IDX = RAM_SIZE - 1;
 
   localparam int unsigned MAX_CYCLES = 500000; // safety timeout per test

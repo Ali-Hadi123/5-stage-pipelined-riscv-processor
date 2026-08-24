@@ -17,7 +17,8 @@
 # Perform boot operations. Can be empty or left undefined unless needed for
 # DUT-specific behavior such as turning on a memory controller or
 # initializing custom state.
-//#define RVMODEL_BOOT
+
+#define RVMODEL_BOOT
 
 // Custom RVMODEL_BOOT_TO_MMODE overrides default RVTEST_BOOT_TO_MMODE
 // if defined.  For most DUTs, the default should work and this macro
@@ -25,7 +26,8 @@
 // macro as blank to bypass the boot process.  If a nonconforming
 // M-mode is implemented, define this macro to set up the necessary
 // state in a fashion similar to RVTEST_BOOT_TO_MMODE.
-#define RVMODEL_BOOT_TO_MMODE
+
+//#define RVMODEL_BOOT_TO_MMODE
 
 ##### TERMINATION #####
 

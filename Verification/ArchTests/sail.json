@@ -142,7 +142,7 @@
           "misaligned_exceptions": {
             "load_store": { "None": null },
             "vector": { "None": null },
-            "amo": {"Some": "AccessFault"}
+            "amo": "AccessFault"
           },
 
           "atomic_support": "AMONone",
@@ -242,8 +242,8 @@
       },
       "vstart": {
         "zero_required": {
-          "arith": "true",
-          "scalar_move": "true"
+          "arith": true,
+          "scalar_move": true
         }
       }
     },

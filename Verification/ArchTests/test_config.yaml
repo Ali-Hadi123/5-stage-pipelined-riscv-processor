@@ -8,13 +8,7 @@ compiler_exe: riscv64-unknown-elf-gcc
 objdump_exe: riscv64-unknown-elf-objdump
 ref_model_exe: sail_riscv_sim
 
-# Path interpreted relative to THIS file's location, i.e.
-# Verification/Arch Tests/ACT4/, once this config lives inside a clone
-# of riscv-arch-test at config/cores/<vendor>/<name>/test_config.yaml.
-# If you instead run ACT4 out-of-tree (CONFIG_FILES pointing at this
-# repo rather than copying it into riscv-arch-test), change this to an
-# absolute or ACT_DIR-relative path - see run_act4_tests.sh.
-udb_config: sail-rv32-max.yaml   # <-- placeholder, see note above
+udb_config: riscv-cpu-rv32i.yaml
 
 linker_script: ./link.ld
 dut_include_dir: .

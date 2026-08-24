@@ -164,7 +164,7 @@
           "vector_misaligned_atomicity_granule_size_exp": 0,
           "reservability": "RsrvNone",
           "supports_cbo_zero": false,
-          // No paging (no Sv32) on this core.
+          // No paging (no Sv32) on this core
           "supports_pte_read": false,
           "supports_pte_write": false
         },

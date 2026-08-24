@@ -1,0 +1,113 @@
+// act4_test_tb.sv
+//
+// Generic runner for one ACT4 self-checking test, loaded as a hex file
+// (converted from the ELF ACT4 produces - see run_act4_tests.sh).
+//
+// ram_size/rom_size MUST match link.ld's RAM_LENGTH, and the sentinel
+// values MUST match RVMODEL_PASS_CODE/RVMODEL_FAIL_CODE in
+// rvmodel_macros.h.
+//
+// Usage:
+//   vvp act4_test_tb.vvp +HEXFILE=path/to/test.hex
+
+`timescale 1ns/1ps
+
+module act4_test_tb;
+
+  localparam int unsigned RAM_SIZE = 32768;   // words -> 128KB, must match link.ld RAM_LENGTH
+  localparam int unsigned ROM_SIZE = 32768;
+  localparam int unsigned HALT_WORD_IDX = RAM_SIZE - 1;
+
+  localparam int unsigned MAX_CYCLES = 500000; // safety timeout per test
+
+  localparam logic [31:0] PASS_SENTINEL = 32'h0000_0001; // must match RVMODEL_PASS_CODE
+  localparam logic [31:0] FAIL_SENTINEL = 32'h0000_0002; // must match RVMODEL_FAIL_CODE
+
+  logic clk;
+  logic rst;
+  logic illegal_instr;
+
+  logic [31:0] fpga_mem_addr;
+  logic [31:0] fpga_mem_wdata;
+  logic fpga_mem_write;
+
+  top #(
+    .ram_size(RAM_SIZE),
+    .rom_size(ROM_SIZE),
+    .init_mem("")
+  ) duv (
+    .clk(clk),
+    .rst(rst),
+    .illegal_instr(illegal_instr),
+    .fpga_mem_addr(fpga_mem_addr),
+    .fpga_mem_wdata(fpga_mem_wdata),
+    .fpga_mem_write(fpga_mem_write)
+  );
+
+  always #5 clk = ~clk;
+
+  string hexfile;
+  int unsigned cycle_count;
+  bit done, timed_out, illegal_seen;
+  logic [31:0] halt_word;
+
+  initial begin
+    clk = 0;
+    rst = 1;
+
+    if (!$value$plusargs("HEXFILE=%s", hexfile)) begin
+      $display("ERROR: +HEXFILE=<path> not provided");
+      $finish(1);
+    end
+
+    #10;
+    rst = 0;
+
+    // Load after reset, same reasoning as arch_test_tb.sv: imem's own
+    // NOP-fill initial block races with this one at time 0 otherwise.
+    $readmemh(hexfile, duv.u_imem.rom);
+
+    done = 1'b0;
+    timed_out = 1'b0;
+    illegal_seen = 1'b0;
+    cycle_count = 0;
+    halt_word = 32'h0;
+
+    while (!done && !timed_out) begin
+      @(posedge clk);
+      cycle_count++;
+
+      halt_word = duv.u_dmem.ram[HALT_WORD_IDX];
+
+      // dmem.ram is not reset/zeroed, so it reads as X until written -
+      // match the exact sentinels rather than "nonzero" to avoid a
+      // false trigger from X on cycle 1.
+      if (halt_word === PASS_SENTINEL || halt_word === FAIL_SENTINEL)
+        done = 1'b1;
+
+      if (illegal_instr && !illegal_seen) begin
+        illegal_seen = 1'b1;
+        $display("NOTE: illegal_instr asserted at cycle %0d (pc frozen) - failing fast instead of waiting out the timeout", cycle_count);
+        timed_out = 1'b1;
+      end
+
+      if (cycle_count >= MAX_CYCLES)
+        timed_out = 1'b1;
+    end
+
+    if (timed_out) begin
+      $display("RVCP-SUMMARY: TEST FAILED - Test File \"%s\" (%s at cycle %0d)",
+                hexfile, illegal_seen ? "illegal instruction" : "timed out", cycle_count);
+      $finish(1);
+    end
+    else if (halt_word === PASS_SENTINEL) begin
+      $display("RVCP-SUMMARY: TEST PASSED - Test File \"%s\"", hexfile);
+      $finish(0);
+    end
+    else begin
+      $display("RVCP-SUMMARY: TEST FAILED - Test File \"%s\"", hexfile);
+      $finish(1);
+    end
+  end
+
+endmodule

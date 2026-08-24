@@ -13,7 +13,7 @@
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 ACT_DIR="${1:?Usage: $0 /path/to/riscv-arch-test}"
 
 CONFIG_NAME="riscv-cpu-rv32i"     # must match `name:` in test_config.yaml

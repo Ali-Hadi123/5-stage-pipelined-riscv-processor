@@ -29,6 +29,10 @@ params:
   MARCHID_IMPLEMENTED: false
   MIMPID_IMPLEMENTED: false
 
+  # No vendor-id CSR either; these feed mvendorid, which doesn't exist here.
+  VENDOR_ID_BANK: 0
+  VENDOR_ID_OFFSET: 0
+
   # main_decoder.sv decodes OP_SYSTEM (ecall/ebreak) as legal and a no-op,
   # rather than trapping - there is no trap mechanism to enter.
   TRAP_ON_ECALL_FROM_M: false
@@ -51,32 +55,34 @@ params:
   TRAP_ON_RESERVED_INSTRUCTION: false
   TRAP_ON_UNIMPLEMENTED_CSR: false
 
-  # No mtval/mtvec - nothing to report a faulting address/cause into.
+  # No mtval - nothing is ever reported into it, on any exception type,
+  # because none of these exception mechanisms exist on this core.
+  REPORT_ENCODING_IN_MTVAL_ON_ILLEGAL_INSTRUCTION: false
+  REPORT_VA_IN_MTVAL_ON_BREAKPOINT: false
+  REPORT_VA_IN_MTVAL_ON_INSTRUCTION_ACCESS_FAULT: false
+  REPORT_VA_IN_MTVAL_ON_INSTRUCTION_MISALIGNED: false
+  REPORT_VA_IN_MTVAL_ON_LOAD_ACCESS_FAULT: false
+  REPORT_VA_IN_MTVAL_ON_LOAD_MISALIGNED: false
+  REPORT_VA_IN_MTVAL_ON_STORE_AMO_ACCESS_FAULT: false
+  REPORT_VA_IN_MTVAL_ON_STORE_AMO_MISALIGNED: false
+
   MTVAL_WIDTH: 32
   MTVEC_ACCESS: ro
   MTVEC_MODES: [0]
-  MTVEC_BASE_ALIGNMENT_DIRECT: 4
-  MTVEC_BASE_ALIGNMENT_VECTORED: 4
-  MTVEC_ILLEGAL_WRITE_BEHAVIOR: retain
 
-  # No PMP.
+  # No PMP at all - the alignment/mode support flags below are only valid
+  # when NUM_PMP_ENTRIES > 0, so they're omitted entirely rather than set
+  # to false.
   NUM_PMP_ENTRIES: 0
-  NUM_USABLE_PMP_ENTRIES: 0
-  PMP_NA4_SUPPORTED: false
-  PMP_NAPOT_SUPPORTED: false
-  PMP_TOR_SUPPORTED: false
 
   # No hardware performance monitor counters beyond what's mandatory.
+  # HPM_EVENTS is only valid if one of HPM_COUNTER_EN[3..31] is true, so
+  # it's omitted.
   HPM_COUNTER_EN: [false, false, false, false, false, false, false, false,
                    false, false, false, false, false, false, false, false,
                    false, false, false, false, false, false, false, false,
                    false, false, false, false, false, false, false, false]
-  HPM_EVENTS: [0]
   MCOUNTINHIBIT_IMPLEMENTED: false
-  COUNTINHIBIT_EN: [false, false, false, false, false, false, false, false,
-                     false, false, false, false, false, false, false, false,
-                     false, false, false, false, false, false, false, false,
-                     false, false, false, false, false, false, false, false]
   MCOUNTENABLE_EN: [false, false, false, false, false, false, false, false,
                      false, false, false, false, false, false, false, false,
                      false, false, false, false, false, false, false, false,

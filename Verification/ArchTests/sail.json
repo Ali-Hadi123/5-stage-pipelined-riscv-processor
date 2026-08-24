@@ -82,7 +82,8 @@
       }
     },
     // No S-mode on this core, so medeleg/mideleg don't exist and these
-    // delegatable-bit masks are never consulted.
+    // delegatable-bit masks are never consulted. Represented at the same
+    // fixed 64-bit width as medeleg for schema consistency.
     "medeleg": {
       "delegatable_bits": {
         "len": 64,
@@ -91,7 +92,7 @@
     },
     "mideleg": {
       "delegatable_bits": {
-        "len": 32,
+        "len": 64,
         "value": "0x0"
       }
     },
@@ -128,7 +129,14 @@
       "supported": true,
       "byte_by_byte": false,
       "order_decreasing": false,
-      "allowed_within_exp": 0
+      "allowed_within_exp": 0,
+      "default_allowed_within_exp": 0,
+      "exceptions": {
+        "load_store": false,
+        "vector": false,
+        "amo": false
+      },
+      "misaligned_split_strategy": "custom"
     },
     "translation": {
       "dirty_update": false
@@ -156,7 +164,7 @@
           "misaligned_exceptions": {
             "load_store": { "None": null },
             "vector": { "None": null },
-            "amo": { "None": null }
+            "amo": "None"
           },
           // No atomic extensions (A/Zaamo/Zalrsc) implemented on this core.
           "atomic_support": "AMONone",
@@ -196,7 +204,7 @@
           "misaligned_exceptions": {
             "load_store": { "Some": "AlignmentException" },
             "vector": { "Some": "AlignmentException" },
-            "amo": { "Some": "AlignmentException" }
+            "amo": "AlignmentException"
           },
           "atomic_support": "AMONone",
           "misaligned_atomicity_granule_size_exp": 0,
@@ -256,13 +264,22 @@
     // riscv-cpu-rv32i.yaml (no M, A, F, D, B, S, U, Zicsr, PMP, or Sv*).
     "M": { "supported": false },
     "A": { "supported": false },
-    "F": { "supported": false },
+    "F": { "supported": false, "fflags_dirty_policy": "Fflags_Dirty_Precise" },
     "D": { "supported": false },
     "V": {
       "support_level": "Disabled",
       "vlen_exp": 8,
       "elen_exp": 6,
-      "vl_use_ceil": false
+      "vl_use_ceil": false,
+      "max_index_eew_exp": 6,
+      "reserved_behavior": {
+        "illegal_vtype": "Vtype_Illegal",
+        "reserved_vsew": "Vsew_Illegal"
+      },
+      "vstart": {
+        "len": 32,
+        "value": "0x0"
+      }
     },
     "B": { "supported": false },
     "S": { "supported": false },
@@ -357,6 +374,28 @@
       "C_readonly_zero": true,
       "SE0_readonly_zero": false
     },
-    "Ssqosid": { "supported": false, "rcid_length": 12, "mcid_length": 12 }
+    "Ssqosid": { "supported": false, "rcid_length": 12, "mcid_length": 12 },
+    // Pointer-masking extensions - no CSR file / S-mode / M-mode config
+    // register on this core, so none of these are implemented.
+    "Smmpm": { "supported": false },
+    "Smnpm": { "supported": false },
+    "Ssnpm": { "supported": false },
+    // No S-mode page-table walker on this core (no Sv32/39/48/57), so
+    // these page-table-pointer / A-D-bit-update extensions are moot.
+    "Ssccptr": { "supported": false },
+    "Sscounterenw": { "supported": false },
+    "Svade": { "supported": false },
+    "Svadu": { "supported": false },
+    "Svnapot": { "supported": false },
+    "Svpbmt": { "supported": false },
+    "Svvptc": { "supported": false },
+    // No atomics/misaligned-access guarantees beyond what dmem.sv already
+    // does (see the "misaligned" block above), and no 16-byte atomics.
+    "Zama16b": { "supported": false },
+    "Ziccamoa": { "supported": false },
+    "Ziccamoc": { "supported": false },
+    "Ziccif": { "supported": false },
+    "Zicclsm": { "supported": false },
+    "Ziccrse": { "supported": false }
   }
 }

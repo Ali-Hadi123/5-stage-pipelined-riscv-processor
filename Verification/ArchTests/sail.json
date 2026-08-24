@@ -9,10 +9,7 @@
       "len": 32,
       "value": "0x0"
     },
-    // No CSR file on this core, so mcounteren/scounteren don't exist and
-    // these values are ignored - left as all-zero (no writable bits)
-    // rather than the upstream template's all-ones default, to match
-    // "nothing is configurable because nothing exists" for this DUT.
+
     "mcounteren_writable_bits": {
       "len": 32,
       "value": "0x0"
@@ -21,8 +18,7 @@
       "len": 32,
       "value": "0x0"
     },
-    // No CSR file / trap mechanism on this core (main_decoder.sv treats
-    // OP_SYSTEM as a legal no-op), so none of these ever fire.
+
     "xtval_nonzero": {
       "illegal_instruction": false,
       "software_breakpoint": false,
@@ -44,22 +40,16 @@
       "fcsr_rm": "Fcsr_RM_Illegal",
       "pmpcfg_write_only": "PMP_ClearPermissions",
       "xenvcfg_cbie": "Xenvcfg_ClearPermissions",
-      // No mtvec/stvec CSR on this core, so xtvec[Mode] can never be
-      // written to a reserved value in the first place; this is present
-      // only to satisfy the schema and is never exercised.
+
       "xtvec_mode": "Xtvec_Ignore",
       "rv32zdinx_odd_register": "Zdinx_Illegal"
     },
-    // No mstatus CSR on this core - FS/VS don't exist, so "Off" (the
-    // most restrictive legal option) best reflects that neither F nor V
-    // is implemented here.
+
     "mstatus": {
       "fs_legal_states": "ExtContext_Off",
       "vs_legal_states": "ExtContext_Off"
     },
-    // No mtvec CSR on this core; both modes are marked supported purely
-    // to satisfy "at least one mode must be supported" - never actually
-    // read or written since the CSR doesn't exist.
+
     "mtvec": {
       "direct": {
         "supported": true,
@@ -70,8 +60,7 @@
         "base_alignment": 2
       }
     },
-    // No S-mode / stvec CSR on this core; present only because the
-    // schema requires it unconditionally.
+
     "stvec": {
       "direct": {
         "supported": true
@@ -81,9 +70,7 @@
         "base_alignment": 2
       }
     },
-    // No S-mode on this core, so medeleg/mideleg don't exist and these
-    // delegatable-bit masks are never consulted. Represented at the same
-    // fixed 64-bit width as medeleg for schema consistency.
+
     "medeleg": {
       "delegatable_bits": {
         "len": 64,
@@ -96,19 +83,13 @@
         "value": "0x0"
       }
     },
-    // Doesn't matter which privileged-ISA version is named since this
-    // core has no privileged architecture (no CSRs, no modes below M).
+
     "privileged_isa_version": "Privileged_ISA_1_13"
   },
   "memory": {
-    // No PMP at all - the alignment/mode support flags below are only valid
-    // when NUM_PMP_ENTRIES > 0, so they're omitted entirely rather than set
-    // to false.
+
     "physaddr_bits": 32,
-    // Address to (hypothetically) write a DTB to; this core never boots
-    // an OS image so no DTB is ever generated, but the address must
-    // still land inside a legal memory region - it falls inside the
-    // combined RAM/ROM region below.
+
     "dtb_address": {
       "len": 64,
       "value": "0x1000"
@@ -121,10 +102,7 @@
       "na4_supported": false,
       "napot_supported": false
     },
-    // dmem.sv (RTL/Data Path/data_mem.sv) does byte/half/word accesses via
-    // byte_addr with no alignment check, so misaligned loads/stores don't
-    // fault - they just don't correctly merge across a word boundary. No
-    // exception is ever raised for them either way.
+
     "misaligned": {
       "supported": true,
       "byte_by_byte": false,
@@ -164,25 +142,21 @@
           "misaligned_exceptions": {
             "load_store": { "None": null },
             "vector": { "None": null },
-            "amo": "None"
+            "amo": {"Some": "AccessFault"}
           },
-          // No atomic extensions (A/Zaamo/Zalrsc) implemented on this core.
+
           "atomic_support": "AMONone",
           "misaligned_atomicity_granule_size_exp": 0,
           "vector_misaligned_atomicity_granule_size_exp": 0,
           "reservability": "RsrvNone",
           "supports_cbo_zero": false,
-          // No paging (no Sv32) on this core
+
           "supports_pte_read": false,
           "supports_pte_write": false
         },
         "include_in_device_tree": true
       },
-      // IO region purely to host the mandatory clint / simple_interrupt_
-      // generator Sail devices below (ACT4's signature generation needs
-      // them enabled even though this DUT has no interrupts at all).
-      // Placed well above the 0x0-0x1FFFF RAM/ROM region so it can never
-      // alias real DUT memory.
+
       {
         "base": {
           "len": 64,
@@ -224,27 +198,19 @@
     "impid": 0,
     "hartid": 0,
     "cache_block_size_exp": 6,
-    // Replaces the old flat "reservation_set_size_exp" field, which the
-    // schema now nests under "reservation". No LR/SC (A/Zalrsc) on this
-    // core, so these values are never actually consulted.
+
     "reservation": {
       "reservation_set_size_exp": 2,
       "require_exact_reservation_addr": false,
       "invalidate_on_same_hart_store": false
     },
-    // No CLINT/timer/interrupts on this core, but the ACT4 framework
-    // requires this Sail device enabled (supported: true) unconditionally
-    // for signature generation, even though the DUT never uses it. Placed
-    // in the IO region above so it can't overlap real DUT memory.
+
     "clint": {
       "supported": true,
       "base": 33554432,
       "size": 786432
     },
-    // Same story as clint above: required by ACT4 signature generation
-    // regardless of whether the DUT implements interrupts. Placed right
-    // after clint (0x02000000 + 0xC0000 = 0x020C0000) within the same IO
-    // region so the two devices don't overlap each other.
+
     "simple_interrupt_generator": {
       "supported": true,
       "base": 34340864,
@@ -253,15 +219,13 @@
     "clock_frequency": 1000000000,
     "instructions_per_tick": 2,
     "wfi_is_nop": true,
-    // No User mode on this core, so this is moot either way.
+
     "wfi_available_to_user_mode": false,
-    // Only relevant to WFI/WRS.* timeouts; this core doesn't implement
-    // those semantics beyond wfi_is_nop above, so the value is unused.
+
     "max_time_to_wait": 10
   },
   "extensions": {
-    // Only base RV32I is implemented - everything below is off to match
-    // riscv-cpu-rv32i.yaml (no M, A, F, D, B, S, U, Zicsr, PMP, or Sv*).
+
     "M": { "supported": false },
     "A": { "supported": false },
     "F": { "supported": false, "fflags_dirty_policy": "Fflags_Dirty_Precise" },
@@ -273,12 +237,14 @@
       "vl_use_ceil": false,
       "max_index_eew_exp": 6,
       "reserved_behavior": {
-        "illegal_vtype": "Vtype_Illegal",
-        "reserved_vsew": "Vsew_Illegal"
+        "illegal_vtype": "IllegalVtype_Illegal",
+        "vstart_out_of_bounds": "Vstart_Ignore"
       },
       "vstart": {
-        "len": 32,
-        "value": "0x0"
+        "zero_required": {
+          "arith": "true",
+          "scalar_move": "true"
+        }
       }
     },
     "B": { "supported": false },
@@ -375,13 +341,25 @@
       "SE0_readonly_zero": false
     },
     "Ssqosid": { "supported": false, "rcid_length": 12, "mcid_length": 12 },
-    // Pointer-masking extensions - no CSR file / S-mode / M-mode config
-    // register on this core, so none of these are implemented.
-    "Smmpm": { "supported": false },
-    "Smnpm": { "supported": false },
-    "Ssnpm": { "supported": false },
-    // No S-mode page-table walker on this core (no Sv32/39/48/57), so
-    // these page-table-pointer / A-D-bit-update extensions are moot.
+
+    "Smmpm": { 
+      "supported": false,
+      "supported_pmlen_7": false,
+      "supported_pmlen_16": false 
+    },
+
+    "Smnpm": { 
+      "supported": false,
+      "supported_pmlen_7": false,
+      "supported_pmlen_16": false 
+    },
+
+    "Ssnpm": { 
+      "supported": false,
+      "supported_pmlen_7": false,
+      "supported_pmlen_16": false 
+    },
+
     "Ssccptr": { "supported": false },
     "Sscounterenw": { "supported": false },
     "Svade": { "supported": false },
@@ -389,8 +367,7 @@
     "Svnapot": { "supported": false },
     "Svpbmt": { "supported": false },
     "Svvptc": { "supported": false },
-    // No atomics/misaligned-access guarantees beyond what dmem.sv already
-    // does (see the "misaligned" block above), and no 16-byte atomics.
+
     "Zama16b": { "supported": false },
     "Ziccamoa": { "supported": false },
     "Ziccamoc": { "supported": false },

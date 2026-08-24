@@ -22,7 +22,7 @@
 // CHANGE ME IF YOU CHANGE link.ld's RAM_LENGTH: this must always equal
 // (RAM_LENGTH - 4), i.e. the byte address of the LAST word of RAM.
 //----------------------------------------------------------------------
-#define RVMODEL_HALT_ADDR   0x0002FFFC     // last word of a 192KB (0x30000) RAM
+#define RVMODEL_HALT_ADDR   0x0003FFFC     // last word of RAM
 #define RVMODEL_PASS_CODE   0x00000001
 #define RVMODEL_FAIL_CODE   0x00000002
 

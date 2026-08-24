@@ -69,6 +69,7 @@ params:
   MTVAL_WIDTH: 32
   MTVEC_ACCESS: ro
   MTVEC_MODES: [0]
+  MTVEC_ILLEGAL_WRITE_BEHAVIOR: retain
 
   # No PMP at all - the alignment/mode support flags below are only valid
   # when NUM_PMP_ENTRIES > 0, so they're omitted entirely rather than set

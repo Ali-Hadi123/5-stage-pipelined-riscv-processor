@@ -53,7 +53,7 @@ params:
 
   # No mtval/mtvec - nothing to report a faulting address/cause into.
   MTVAL_WIDTH: 32
-  MTVEC_ACCESS: none
+  MTVEC_ACCESS: ro
   MTVEC_MODES: [0]
   MTVEC_BASE_ALIGNMENT_DIRECT: 4
   MTVEC_BASE_ALIGNMENT_VECTORED: 4
@@ -62,7 +62,6 @@ params:
   # No PMP.
   NUM_PMP_ENTRIES: 0
   NUM_USABLE_PMP_ENTRIES: 0
-  PMP_GRANULARITY: 0
   PMP_NA4_SUPPORTED: false
   PMP_NAPOT_SUPPORTED: false
   PMP_TOR_SUPPORTED: false

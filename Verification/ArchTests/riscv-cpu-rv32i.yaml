@@ -6,18 +6,86 @@ type: fully configured
 name: riscv-cpu-rv32i
 description: >
   RISC-V-CPU (this repo's 5-stage pipelined `top` module): base RV32I only.
-  No CSR file, no privilege modes (M-mode is implicit/only), no traps other
-  than the core's own illegal-instruction halt, and no interrupts. See
-  Verification/ArchTests/rvmodel_macros.h for the reasoning behind the
-  matching test_config.yaml's `include_priv_tests: False`.
+  No CSR file, no privilege modes below M, and no traps other than the
+  core's own illegal-instruction halt (main_decoder.sv treats OP_SYSTEM as
+  a legal no-op rather than trapping ecall/ebreak/CSR ops). Sm is marked
+  implemented only because UDB gates MXLEN and other base hart parameters
+  on it - every RISC-V hart architecturally has M-mode - but every optional
+  M-mode feature below (CSRs, PMP, HPM counters, marchid/mimpid) is turned
+  off to reflect that this core does not actually implement them. See
+  Verification/ArchTests/rvmodel_macros.h for the matching rationale behind
+  test_config.yaml's `include_priv_tests: False`.
 implemented_extensions:
   - { name: I, version: "= 2.1" }
+  - { name: Sm, version: "= 1.12.0" }
 
 params:
-  # Base XLEN for the hart. This is the one param the ACT4 framework's
-  # "minimal header" example (docs/DeveloperGuide.md) requires even for a
-  # single-extension, unprivileged-only I config:
-  #   REQUIRED_EXTENSIONS: ['I']
-  #   params:
-  #     MXLEN: 32
+  # Base hart width. Gated on Sm in UDB's schema.
   MXLEN: 32
+
+  # This core has no CSR file at all: misa, marchid, mimpid, mtvec, etc.
+  # are all simply absent, not hardwired to a fixed value.
+  MISA_CSR_IMPLEMENTED: false
+  MARCHID_IMPLEMENTED: false
+  MIMPID_IMPLEMENTED: false
+
+  # main_decoder.sv decodes OP_SYSTEM (ecall/ebreak) as legal and a no-op,
+  # rather than trapping - there is no trap mechanism to enter.
+  TRAP_ON_ECALL_FROM_M: false
+  TRAP_ON_EBREAK: false
+  PRECISE_SYNCHRONOUS_EXCEPTIONS: true
+
+  # dmem.sv (RTL/Data Path/data_mem.sv) does byte/half/word accesses via
+  # byte_addr with no alignment check, so misaligned loads/stores don't
+  # fault - they just don't correctly merge across a word boundary. No
+  # exception is ever raised for them either way.
+  MISALIGNED_LDST: true
+  MISALIGNED_LDST_EXCEPTION_PRIORITY: low
+  MISALIGNED_MAX_ATOMICITY_GRANULE_SIZE: 4
+  MISALIGNED_SPLIT_STRATEGY: custom
+
+  # illegal_instr (RTL/Top/top_level.sv) halts the core (freezes PC) rather
+  # than trapping through a CSR-based exception mechanism.
+  TRAP_ON_ILLEGAL_WLRL: false
+  TRAP_ON_UNIMPLEMENTED_INSTRUCTION: false
+  TRAP_ON_RESERVED_INSTRUCTION: false
+  TRAP_ON_UNIMPLEMENTED_CSR: false
+
+  # No mtval/mtvec - nothing to report a faulting address/cause into.
+  MTVAL_WIDTH: 32
+  MTVEC_ACCESS: none
+  MTVEC_MODES: [0]
+  MTVEC_BASE_ALIGNMENT_DIRECT: 4
+  MTVEC_BASE_ALIGNMENT_VECTORED: 4
+  MTVEC_ILLEGAL_WRITE_BEHAVIOR: retain
+
+  # No PMP.
+  NUM_PMP_ENTRIES: 0
+  NUM_USABLE_PMP_ENTRIES: 0
+  PMP_GRANULARITY: 0
+  PMP_NA4_SUPPORTED: false
+  PMP_NAPOT_SUPPORTED: false
+  PMP_TOR_SUPPORTED: false
+
+  # No hardware performance monitor counters beyond what's mandatory.
+  HPM_COUNTER_EN: [false, false, false, false, false, false, false, false,
+                   false, false, false, false, false, false, false, false,
+                   false, false, false, false, false, false, false, false,
+                   false, false, false, false, false, false, false, false]
+  HPM_EVENTS: [0]
+  MCOUNTINHIBIT_IMPLEMENTED: false
+  COUNTINHIBIT_EN: [false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false]
+  MCOUNTENABLE_EN: [false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false,
+                     false, false, false, false, false, false, false, false]
+
+  # No physical memory attributes / address space beyond the RAM/ROM
+  # windows the imem/dmem modules define; picking a conservative width.
+  PHYS_ADDR_WIDTH: 32
+  PMA_GRANULARITY: 2
+  CONFIG_PTR_ADDRESS: 0
+  M_MODE_ENDIANNESS: little

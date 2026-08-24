@@ -54,12 +54,21 @@ rvmodel_pass_loop:                          \
 rvmodel_fail_loop:                          \
         jal x0, rvmodel_fail_loop
 
-//----------------------------------------------------------------------
-// Everything else (RVMODEL_BOOT, RVMODEL_IO_*, RVMODEL_ACCESS_FAULT_
-// ADDRESS, timer/MSIP/interrupt macros) is intentionally omitted:
-// no boot sequence needed, no console wired up in simulation, and no
-// machine-mode/CSR/interrupt hardware exists on this core. Per the ACT
-// README these are all optional and may be left undefined.
-//----------------------------------------------------------------------
+#define RVMODEL_IO_INIT(_R1, _R2, _R3)    \
+#define RVMODEL_IO_WRITE_STR(_R1, _R2, _R3, _STR_PTR)               \
+
+#define RVMODEL_INTERRUPT_LATENCY 10
+#define RVMODEL_TIMER_INT_SOON_DELAY 100
+
+#define RVMODEL_CLR_MEXT_INT(_R1, _R2)
+
+#define RVMODEL_SET_MSW_INT(_R1, _R2) \
+#define RVMODEL_CLR_MSW_INT(_R1, _R2) \
+
+#define RVMODEL_SET_SEXT_INT(_R1, _R2)
+#define RVMODEL_CLR_SEXT_INT(_R1, _R2)
+
+#define RVMODEL_SET_SSW_INT(_R1, _R2) \
+#define RVMODEL_CLR_SSW_INT(_R1, _R2) \
 
 #endif // RVMODEL_MACROS_H

@@ -26,7 +26,6 @@ echo "============================================================"
 (
   cd "$ACT_DIR" &&
   EXTENSIONS=I \
-  XLEN=32 \
   CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
   WORKDIR="$WORKDIR" \
   make --jobs "$(nproc)"
@@ -80,7 +79,7 @@ for elf in "$ELF_DIR"/*.elf; do
   bin="$SIM_WORKDIR/$name.bin"
   hex="$SIM_WORKDIR/$name.hex"
 
-  riscv64-unknown-elf-objcopy -O binary "$elf" "$bin"
+  riscv32-unknown-elf-objcopy -O binary "$elf" "$bin"
   python3 "$ROOT/Verification/Top Level Tests/Assembly Programs/bin_to_hex.py" "$bin" "$hex" > /dev/null
 
   echo "============================================================"

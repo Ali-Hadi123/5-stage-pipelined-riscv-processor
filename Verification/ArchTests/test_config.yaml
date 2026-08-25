@@ -4,8 +4,8 @@
 # privilege modes, no CSRs, no interrupts.
 
 name: riscv-cpu-rv32i
-compiler_exe: riscv64-unknown-elf-gcc
-objdump_exe: riscv64-unknown-elf-objdump
+compiler_exe: riscv32-unknown-elf-gcc
+objdump_exe: riscv32-unknown-elf-objdump
 ref_model_exe: sail_riscv_sim
 
 udb_config: riscv-cpu-rv32i.yaml

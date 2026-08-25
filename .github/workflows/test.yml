@@ -46,9 +46,9 @@ jobs:
           mise trust .mise.toml
           pip install -e ./framework -e ./generators/testgen -e ./generators/coverage --break-system-packages
  
-      - name: Install RISC-V GCC toolchain
+      - name: Install RISC-V GCC toolchain (RV32)
         run: |
-          curl --location https://github.com/riscv-collab/riscv-gnu-toolchain/releases/download/2025.07.16/riscv64-elf-ubuntu-22.04-gcc-nightly-2025.07.16-nightly.tar.xz \
+          curl --location https://github.com/riscv-collab/riscv-gnu-toolchain/releases/latest/download/riscv32-elf-ubuntu-22.04-gcc.tar.xz \
             | sudo tar xvJ --directory=/usr/local --strip-components=1
           echo "/usr/local/bin" >> "$GITHUB_PATH"
  

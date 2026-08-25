@@ -30,10 +30,6 @@ echo "============================================================"
   WORKDIR="$WORKDIR" \
   make tests
 
-  sed -n '30,45p' "$ACT_DIR/tests/rv32i/I/I-add-00.S"
-
-  grep -rn "define.*RVTEST_SIGUPD\|define LREG\|define SREG\|define REGWIDTH" "$ACT_DIR"/**/test_macros.h "$ACT_DIR"/**/arch_test.h 2>/dev/null
-
   BAD_OPCODES='\b(lq|sq|ld|sd|addiw|addw|subw|sllw|srlw|sraw|slliw|srliw|sraiw|divw|divuw|remw|remuw|mulw)\b'
   while IFS= read -r -d '' f; do
     echo "!! Excluding generated test with non-RV32I opcode: $f"
@@ -44,7 +40,6 @@ echo "============================================================"
   EXTENSIONS=I \
   CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
   WORKDIR="$WORKDIR" \
-  VERBOSE=True \
   make --jobs "$(nproc)"
 )
 BUILD_STATUS=$?
@@ -95,6 +90,9 @@ fi
 TOTAL=0
 PASSED=0
 
+RESULTS_FILE="$ROOT/act4_results.txt"
+: > "$RESULTS_FILE"
+
 for elf in "${ELF_FILES[@]}"; do
   name="$(basename "${elf%.elf}")"
   TOTAL=$((TOTAL + 1))
@@ -116,9 +114,13 @@ for elf in "${ELF_FILES[@]}"; do
   echo "============================================================"
 
   if vvp "$SIM_BIN" +HEXFILE="$hex" +TOHOST_ADDR="$TOHOST_ADDR" | tee "$SIM_WORKDIR/$name.log" | grep -q 'RVCP-SUMMARY: TEST PASSED'; then
+    echo "PASS $name" >> "$RESULTS_FILE"
     PASSED=$((PASSED + 1))
+  else
+    echo "FAIL $name" >> "$RESULTS_FILE"
   fi
 done
+cp "$SIM_WORKDIR"/*.log "$ROOT/act4_logs/" 2>/dev/null || true
 shopt -u nullglob
 
 if [ "$TOTAL" -eq 0 ]; then

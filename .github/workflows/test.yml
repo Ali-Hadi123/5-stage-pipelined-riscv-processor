@@ -62,3 +62,12 @@ jobs:
         run: |
           chmod +x "Verification/ArchTests/run_act4_tests.sh"
           "Verification/ArchTests/run_act4_tests.sh" /tmp/riscv-arch-test
+
+      - name: Upload ACT4 results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: act4-results
+          path: |
+            act4_results.txt
+            act4_logs/

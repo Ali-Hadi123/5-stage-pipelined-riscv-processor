@@ -85,11 +85,17 @@ if ! iverilog -g2012 -o "$SIM_BIN" "${RTL_SOURCES[@]}" "$SCRIPT_DIR/act4_test_tb
   exit 1
 fi
 
+mapfile -d '' ELF_FILES < <(find "$ELF_DIR" -name '*.elf' -print0 | sort -z)
+
+if [ "${#ELF_FILES[@]}" -eq 0 ]; then
+  echo "!! No .elf files found under $ELF_DIR"
+  exit 1
+fi
+
 TOTAL=0
 PASSED=0
 
-shopt -s nullglob
-for elf in "$ELF_DIR"/*.elf; do
+for elf in "${ELF_FILES[@]}"; do
   name="$(basename "${elf%.elf}")"
   TOTAL=$((TOTAL + 1))
 

@@ -30,6 +30,10 @@ echo "============================================================"
   WORKDIR="$WORKDIR" \
   make tests
 
+  sed -n '30,45p' "$ACT_DIR/tests/rv32i/I/I-add-00.S"
+
+  grep -rn "define.*RVTEST_SIGUPD\|define LREG\|define SREG\|define REGWIDTH" "$ACT_DIR"/**/test_macros.h "$ACT_DIR"/**/arch_test.h 2>/dev/null
+
   BAD_OPCODES='\b(lq|sq|ld|sd|addiw|addw|subw|sllw|srlw|sraw|slliw|srliw|sraiw|divw|divuw|remw|remuw|mulw)\b'
   while IFS= read -r -d '' f; do
     echo "!! Excluding generated test with non-RV32I opcode: $f"

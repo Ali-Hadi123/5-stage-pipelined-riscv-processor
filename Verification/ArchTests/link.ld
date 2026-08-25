@@ -48,6 +48,9 @@ SECTIONS
     __bss_end = .;
   } > ram
 
+  . = ALIGN(8);
+  .tohost . : { *(.tohost) } > ram
+
   . = ALIGN(16);
   __stack_bottom = .;
   . += STACK_SIZE * NUM_HARTS;

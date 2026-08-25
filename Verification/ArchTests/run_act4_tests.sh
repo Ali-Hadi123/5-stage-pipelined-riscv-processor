@@ -105,11 +105,17 @@ for elf in "${ELF_FILES[@]}"; do
   riscv32-unknown-elf-objcopy -O binary "$elf" "$bin"
   python3 "$ROOT/Verification/Top Level Tests/Assembly Programs/bin_to_hex.py" "$bin" "$hex" > /dev/null
 
+  TOHOST_ADDR="$(riscv32-unknown-elf-nm "$elf" | awk '$3 == "tohost" { print "0x" $1 }')"
+  if [ -z "$TOHOST_ADDR" ]; then
+    echo "!! Could not find 'tohost' symbol in $elf - skipping"
+    continue
+  fi
+
   echo "============================================================"
   echo " $name"
   echo "============================================================"
 
-  if vvp "$SIM_BIN" +HEXFILE="$hex" | tee "$SIM_WORKDIR/$name.log" | grep -q 'RVCP-SUMMARY: TEST PASSED'; then
+  if vvp "$SIM_BIN" +HEXFILE="$hex" +TOHOST_ADDR="$TOHOST_ADDR" | tee "$SIM_WORKDIR/$name.log" | grep -q 'RVCP-SUMMARY: TEST PASSED'; then
     PASSED=$((PASSED + 1))
   fi
 done

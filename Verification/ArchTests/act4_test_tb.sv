@@ -16,12 +16,11 @@ module act4_test_tb;
 
   localparam int unsigned RAM_SIZE = 81920;   // words, must match link.ld RAM_LENGTH
   localparam int unsigned ROM_SIZE = 81920;
-  localparam int unsigned HALT_WORD_IDX = RAM_SIZE - 1;
 
   localparam int unsigned MAX_CYCLES = 500000; // safety timeout per test
 
   localparam logic [31:0] PASS_SENTINEL = 32'h0000_0001; // must match RVMODEL_PASS_CODE
-  localparam logic [31:0] FAIL_SENTINEL = 32'h0000_0002; // must match RVMODEL_FAIL_CODE
+  localparam logic [31:0] FAIL_SENTINEL = 32'h0000_0003; // must match RVMODEL_FAIL_CODE
 
   logic clk;
   logic rst;
@@ -47,6 +46,8 @@ module act4_test_tb;
   always #5 clk = ~clk;
 
   string hexfile;
+  logic [31:0] tohost_addr;
+  logic [31:0] tohost_word_idx;
   int unsigned cycle_count;
   bit done, timed_out, illegal_seen;
   logic [31:0] halt_word;
@@ -59,6 +60,12 @@ module act4_test_tb;
       $display("ERROR: +HEXFILE=<path> not provided");
       $finish(1);
     end
+
+    if (!$value$plusargs("TOHOST_ADDR=%h", tohost_addr)) begin
+      $display("ERROR: +TOHOST_ADDR=<hex byte address> not provided");
+      $finish(1);
+    end
+    tohost_word_idx = tohost_addr >> 2;
 
     #10;
     rst = 0;
@@ -77,7 +84,7 @@ module act4_test_tb;
       @(posedge clk);
       cycle_count++;
 
-      halt_word = duv.u_dmem.ram[HALT_WORD_IDX];
+      halt_word = duv.u_dmem.ram[tohost_word_idx];
 
       // dmem.ram is not reset/zeroed, so it reads as X until written -
       // match the exact sentinels rather than "nonzero" to avoid a

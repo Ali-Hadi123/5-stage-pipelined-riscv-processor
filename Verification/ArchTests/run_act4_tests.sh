@@ -28,6 +28,7 @@ echo "============================================================"
   EXTENSIONS=I \
   CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
   WORKDIR="$WORKDIR" \
+  VERBOSE=True \
   make --jobs "$(nproc)"
 )
 BUILD_STATUS=$?

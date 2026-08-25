@@ -34,6 +34,7 @@ jobs:
       - name: Clone riscv-arch-test (ACT4)
         run: |
           git clone --depth 1 --branch act4 https://github.com/riscv/riscv-arch-test.git /tmp/riscv-arch-test
+          git -C /tmp/riscv-arch-test checkout 2e655961f9edc688c5cf0c0ea129a368a17a5731
  
       - name: Install mise
         run: |

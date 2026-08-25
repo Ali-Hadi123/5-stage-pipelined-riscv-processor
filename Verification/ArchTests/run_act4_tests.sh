@@ -28,6 +28,18 @@ echo "============================================================"
   EXTENSIONS=I \
   CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
   WORKDIR="$WORKDIR" \
+  make tests
+
+  BAD_OPCODES='\b(lq|sq|ld|sd|addiw|addw|subw|sllw|srlw|sraw|slliw|srliw|sraiw|divw|divuw|remw|remuw|mulw)\b'
+  while IFS= read -r -d '' f; do
+    echo "!! Excluding generated test with non-RV32I opcode: $f"
+    rm -f "$f"
+  done < <(grep -lrEZ "$BAD_OPCODES" "$ACT_DIR/tests/rv32i" 2>/dev/null)
+
+  # Drop any generated rv32i test source that references a 64/128-bit-only opcode.
+  EXTENSIONS=I \
+  CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
+  WORKDIR="$WORKDIR" \
   VERBOSE=True \
   make --jobs "$(nproc)"
 )

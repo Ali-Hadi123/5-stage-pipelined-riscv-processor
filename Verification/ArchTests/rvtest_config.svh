@@ -23,6 +23,7 @@
   //===== Base ISA / XLEN =====
 
   localparam int unsigned RVTEST_XLEN = 32;
+  localparam int unsigned XLEN = 32;
 
   //===== Implemented extensions =====
   // Only the base integer extension. Everything else - M, A, F, D, C, B,

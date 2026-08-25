@@ -22,6 +22,7 @@
 
 #define __riscv_xlen 32
 #define RVTEST_XLEN  32
+#define XLEN 32
 
 /***** Implemented extensions *****
  * Only the base integer extension. Everything else - M, A, F, D, C, B, V,

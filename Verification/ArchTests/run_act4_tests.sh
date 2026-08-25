@@ -26,7 +26,7 @@ echo "============================================================"
 (
   cd "$ACT_DIR" &&
   EXTENSIONS=I \
-  XLEN = 32 \
+  XLEN=32 \
   CONFIG_FILES="$SCRIPT_DIR/test_config.yaml" \
   WORKDIR="$WORKDIR" \
   make --jobs "$(nproc)"

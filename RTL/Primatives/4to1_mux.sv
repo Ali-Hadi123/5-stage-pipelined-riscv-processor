@@ -10,6 +10,7 @@ module mux4 #(parameter WIDTH = 32) (
       2'b01: result = b;
       2'b10: result = c;
       2'b11: result = d;
+      default: result = {WIDTH{1'b0}};
     endcase
   end
 

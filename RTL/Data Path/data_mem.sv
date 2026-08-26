@@ -65,11 +65,13 @@ module dmem #(
       2'b01: rbyte = rword[15:8];
       2'b10: rbyte = rword[23:16];
       2'b11: rbyte = rword[31:24];
+      default: rbyte = '0;
     endcase
 
     unique case (byte_off[1])
       1'b0: rhalf = rword[15:0];
       1'b1: rhalf = rword[31:16];
+      default: rhalf = '0;
     endcase
 
     read_data = '0;

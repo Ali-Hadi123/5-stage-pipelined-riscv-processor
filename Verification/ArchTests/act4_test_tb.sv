@@ -135,7 +135,7 @@ module act4_test_tb;
         $display("");
 
         // Don't immediately stop.
-        // Let the CPU continue so we can see what happens.
+        // Let the CPU continue so we can see what happens
       end
 
       // dmem.ram is not reset/zeroed, so it reads as X until written -

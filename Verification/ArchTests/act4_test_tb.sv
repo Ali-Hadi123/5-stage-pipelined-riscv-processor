@@ -109,6 +109,18 @@ module act4_test_tb;
           duv.fpga_mem_addr,
           duv.fpga_mem_wdata
         );
+
+        $display(
+          "DEBUG: rs1E=%0d rdM=%0d rdW=%0d fwdA=%0d rdata1E=%08h wb=%08h mem=%08h alu=%08h",
+          de_out.rs1_addr,
+          em_out.rd_addr,
+          mw_out.rd_addr,
+          fwdA,
+          de_out.rdata1,
+          wb_data,
+          em_out.alu_result,
+          alu_resultE
+        );
       end
 
       if (fpga_mem_write) begin

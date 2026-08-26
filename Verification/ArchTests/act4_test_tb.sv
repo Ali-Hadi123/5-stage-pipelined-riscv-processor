@@ -67,6 +67,15 @@ module act4_test_tb;
     end
     tohost_word_idx = tohost_addr >> 2;
 
+    $display("");
+    $display("============================================================");
+    $display("ACT4 DEBUG");
+    $display("HEXFILE      = %s", hexfile);
+    $display("TOHOST_ADDR  = %08h", tohost_addr);
+    $display("TOHOST_INDEX = %0d", tohost_word_idx);
+    $display("============================================================");
+    $display("");
+
     #10;
     rst = 0;
 
@@ -88,6 +97,47 @@ module act4_test_tb;
 
       halt_word = duv.u_dmem.ram[tohost_word_idx];
 
+      if (cycle_count <= 100) begin
+        $display(
+          "cycle=%0d  PC=%08h  instr=%08h  illegal=%b  mem_write=%b addr=%08h wdata=%08h",
+          cycle_count,
+          duv.pc_out,
+          duv.instrF,
+          illegal_instr,
+          duv.em_out.alu_result,
+          duv.fpga_mem_write,
+          duv.fpga_mem_addr,
+          duv.fpga_mem_wdata
+        );
+      end
+
+      if (fpga_mem_write) begin
+        $display(
+          "STORE: cycle=%0d addr=%08h data=%08h",
+          cycle_count,
+          fpga_mem_addr,
+          fpga_mem_wdata
+        );
+      end
+
+      
+      if (illegal_instr && !illegal_seen) begin
+
+        illegal_seen = 1;
+
+        $display("");
+        $display("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        $display("ILLEGAL INSTRUCTION DETECTED");
+        $display("cycle      = %0d", cycle_count);
+        $display("PC         = %08h", duv.pc_out);
+        $display("instr      = %08h", duv.instrF);
+        $display("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        $display("");
+
+        // Don't immediately stop.
+        // Let the CPU continue so we can see what happens.
+      end
+
       // dmem.ram is not reset/zeroed, so it reads as X until written -
       // match the exact sentinels rather than "nonzero" to avoid a
       // false trigger from X on cycle 1.
@@ -103,6 +153,18 @@ module act4_test_tb;
       if (cycle_count >= MAX_CYCLES)
         timed_out = 1'b1;
     end
+
+    $display("");
+    $display("============================================================");
+    $display("ACT4 DEBUG RESULT");
+    $display("============================================================");
+    $display("cycles       = %0d", cycle_count);
+    $display("tohost addr  = %08h", tohost_addr);
+    $display("tohost value = %08h", halt_word);
+    $display("illegal seen = %b", illegal_seen);
+    $display("final PC     = %08h", duv.pc_out);
+    $display("final instr  = %08h", duv.instrF);
+    $display("============================================================");
 
     if (timed_out) begin
       $display("RVCP-SUMMARY: TEST FAILED - Test File \"%s\" (%s at cycle %0d)",

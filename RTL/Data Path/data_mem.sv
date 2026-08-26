@@ -19,7 +19,7 @@ module dmem #(
   integer i;
   initial begin
     for (i=0; i<ram_size; i++)
-      ram[ri] = '0;
+      ram[i] = '0;
   end
 
   logic [$clog2(ram_size)-1:0] windex;

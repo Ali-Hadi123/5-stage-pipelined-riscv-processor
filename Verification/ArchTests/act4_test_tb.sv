@@ -73,6 +73,7 @@ module act4_test_tb;
     // Load after reset, same reasoning as arch_test_tb.sv: imem's own
     // NOP-fill initial block races with this one at time 0 otherwise.
     $readmemh(hexfile, duv.u_imem.rom);
+    $readmemh(hexfile, duv.u_dmem.ram);
 
     done = 1'b0;
     timed_out = 1'b0;
@@ -82,6 +83,7 @@ module act4_test_tb;
 
     while (!done && !timed_out) begin
       @(posedge clk);
+      #1;
       cycle_count++;
 
       halt_word = duv.u_dmem.ram[tohost_word_idx];

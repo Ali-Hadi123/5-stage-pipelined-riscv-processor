@@ -113,7 +113,8 @@ for elf in "${ELF_FILES[@]}"; do
   echo " $name"
   echo "============================================================"
 
-  if vvp "$SIM_BIN" +HEXFILE="$hex" +TOHOST_ADDR="$TOHOST_ADDR" | tee "$SIM_WORKDIR/$name.log" | grep -q 'RVCP-SUMMARY: TEST PASSED'; then
+  vvp "$SIM_BIN" +HEXFILE="$hex" +TOHOST_ADDR="$TOHOST_ADDR" | tee "$SIM_WORKDIR/$name.log" | grep -q 'RVCP-SUMMARY: TEST PASSED'; then
+  if grep -q 'RVCP-SUMMARY: TEST PASSED' "$SIM_WORKDIR/$name.log"; then
     echo "PASS $name" >> "$RESULTS_FILE"
     PASSED=$((PASSED + 1))
   else

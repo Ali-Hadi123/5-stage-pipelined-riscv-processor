@@ -16,6 +16,12 @@ module dmem #(
 
   logic [XLEN-1:0] ram [0:ram_size-1]; //Creates 4KB of memory when ram_size = 1024.
   
+  integer i;
+  initial begin
+    for (i=0; i<ram_size; i++)
+      ram[ri] = '0;
+  end
+
   logic [$clog2(ram_size)-1:0] windex;
   assign windex = byte_addr[$clog2(ram_size)+1:2];
   logic [1:0] byte_off;

@@ -111,7 +111,7 @@ module act4_test_tb;
         );
 
         $display(
-          "DEBUG: rs1E=%0d rdM=%0d rdW=%0d fwdA=%0d rdata1E=%08h wb=%08h mem=%08h alu=%08h",
+          "DEBUG: rs1E=%0d rdM=%0d rdW=%0d fwdA=%0d rdata1E=%08h wb=%08h mem=%08h alu=%08h immE=%08h",
           duv.de_out.rs1_addr,
           duv.em_out.rd_addr,
           duv.mw_out.rd_addr,
@@ -119,7 +119,8 @@ module act4_test_tb;
           duv.de_out.rdata1,
           duv.wb_data,
           duv.em_out.alu_result,
-          duv.alu_resultE
+          duv.alu_resultE,
+          duv.de_out.imm_out
         );
       end
 

@@ -199,6 +199,11 @@ module top #(
         .fwdB(fwdB)
     );
 
+    logic [XLEN-1:0] fwd_dataM;
+    assign fwd_dataM = (em_out.result_src == RESULT_PCPLUS4)  ? em_out.pc_plus4  :
+                        (em_out.result_src == RESULT_PCTARGET) ? em_out.pc_target :
+                        em_out.alu_result;
+
     logic [XLEN-1:0] fwd_rdata1E, fwd_rdata2E;
 
     mux3 #(.WIDTH(XLEN)) u_fwdA_mux(

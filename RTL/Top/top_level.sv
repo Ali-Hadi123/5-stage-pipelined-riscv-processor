@@ -209,7 +209,7 @@ module top #(
     mux3 #(.WIDTH(XLEN)) u_fwdA_mux(
         .a(de_out.rdata1),
         .b(wb_data),
-        .c(em_out.alu_result),
+        .c(fwd_dataM),
         .sel(fwdA),
         .result(fwd_rdata1E)
     );
@@ -217,7 +217,7 @@ module top #(
     mux3 #(.WIDTH(XLEN)) u_fwdB_mux(
         .a(de_out.rdata2),
         .b(wb_data),
-        .c(em_out.alu_result),
+        .c(fwd_dataM),
         .sel(fwdB),
         .result(fwd_rdata2E)
     );

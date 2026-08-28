@@ -9,6 +9,7 @@ module imem_tb;
   int word_index;
   logic clk;
   logic rst;
+  logic stall;
 
   logic [XLEN-1:0] default_pc_addr;
   logic [XLEN-1:0] default_instr;
@@ -19,6 +20,7 @@ module imem_tb;
   ) duv_default (
     .clk(clk),
     .rst(rst),
+    .stall(stall),
     .pc_addr(default_pc_addr),
     .instr(default_instr)
   );
@@ -30,6 +32,9 @@ module imem_tb;
     .init_mem("instr_mem_test.hex"),
     .rom_size(16)
   ) duv_init (
+    .clk(clk),
+    .rst(rst),
+    .stall(stall),
     .pc_addr(init_pc_addr),
     .instr(init_instr)
   );

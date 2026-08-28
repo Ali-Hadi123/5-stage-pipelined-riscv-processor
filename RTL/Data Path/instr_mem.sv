@@ -7,6 +7,7 @@ module imem #(
 (
   input logic clk,
   input logic rst,
+  input logic stall,
   input logic [XLEN-1:0] pc_addr,
   output logic [XLEN-1:0] instr
 );
@@ -27,7 +28,7 @@ module imem #(
   always_ff @(posedge clk or posedge rst) begin
     if (rst)
       instr <= 32'h0000_0013;
-    else
+    else if (~stall)
       instr <= (word_index < rom_size) ? rom[word_index[$clog2(rom_size)-1:0]] : 32'h0000_0013;
   end
   

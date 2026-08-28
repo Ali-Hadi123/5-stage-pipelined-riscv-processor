@@ -46,7 +46,7 @@ module top #(
     f1f2_reg u_f1f2_reg(
         .clk(clk),
         .rst(rst),
-        .stall(stallD),
+        .stall(stallF),
         .d_in(f1f2_in),
         .d_out(f1f2_out)
     );
@@ -59,6 +59,7 @@ module top #(
     ) u_imem(
         .clk(clk),
         .rst(rst),
+        .stall(stallF),
         .pc_addr(pc_out),
         .instr(instrF)
     );

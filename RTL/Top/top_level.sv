@@ -57,6 +57,8 @@ module top #(
         .init_mem(init_mem),
         .rom_size(rom_size)
     ) u_imem(
+        .clk(clk),
+        .rst(rst),
         .pc_addr(pc_out),
         .instr(instrF)
     );

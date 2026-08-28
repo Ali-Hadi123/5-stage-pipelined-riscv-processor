@@ -5,13 +5,15 @@ module imem #(
   parameter int unsigned rom_size = 1024
 )
 (
-  input [XLEN-1:0] pc_addr,
-  output [XLEN-1:0] instr
+  input logic clk,
+  input logic rst,
+  input logic [XLEN-1:0] pc_addr,
+  output logic [XLEN-1:0] instr
 );
 
-  logic [XLEN-1:0] rom [0:rom_size-1]; //Creates 4KB of memory when rom_size = 1024.
-  integer i;
+  (* rom_style = "block" *) logic [XLEN-1:0] rom [0:rom_size-1]; //Creates 4KB of memory when rom_size = 1024.
   
+  integer i;
   initial begin
     for (i=0; i<rom_size; i++)
       rom[i] = 32'h0000_0013; //Preemptively fills rom with NOP instructions in case of a hex file less than rom_size words.
@@ -21,6 +23,12 @@ module imem #(
 
   logic [XLEN-1:0] word_index;
   assign word_index = pc_addr >> 2;
-  assign instr = (word_index < rom_size) ? rom[word_index[$clog2(rom_size)-1:0]] : 32'h0000_0013;
+
+  always_ff @(posedge clk or posedge rst) begin
+    if (rst)
+      instr <= 32'h0000_0013;
+    else
+      instr <= (word_index < rom_size) ? rom[word_index[$clog2(rom_size)-1:0]] : 32'h0000_0013;
+  end
   
 endmodule

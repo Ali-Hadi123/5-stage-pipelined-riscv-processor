@@ -7,6 +7,8 @@ module imem_tb;
   int unsigned passed_tests = 0;
   logic default_is_correct;
   int word_index;
+  logic clk;
+  logic rst;
 
   logic [XLEN-1:0] default_pc_addr;
   logic [XLEN-1:0] default_instr;
@@ -15,6 +17,8 @@ module imem_tb;
     .init_mem(""),
     .rom_size(1024)
   ) duv_default (
+    .clk(clk),
+    .rst(rst),
     .pc_addr(default_pc_addr),
     .instr(default_instr)
   );
@@ -37,7 +41,8 @@ module imem_tb;
   );
     init_pc_addr = addr;
 
-    #10;
+    @(posedge clk);
+    #1;
 
     total_tests++;
  
@@ -49,14 +54,21 @@ module imem_tb;
       $error("Failed: %s\nExpected instr = %h\nGot instr = %h", test_name, exp_instr, init_instr);
   endtask
 
+  always #5 clk = ~clk;
+
   initial begin
     $dumpfile("instr_mem_tb.vcd");
     $dumpvars(0, imem_tb);
 
+    clk = 0;
+    rst = 1;
+    #10;
+    rst = 0;
     default_pc_addr = 32'd0;
     init_pc_addr = 32'd0;
 
-    #10;
+    @(posedge clk);
+    #1;
 
     $display("STARTING IMEM TESTING!");
 
@@ -67,7 +79,8 @@ module imem_tb;
     for(word_index = 0; word_index < 1024; word_index++) begin
       default_pc_addr = word_index * 4;
 
-      #10;
+      @(posedge clk);
+      #1;
 
       if (default_instr !== 32'h0000_0013) begin
         default_is_correct = 1'b0;

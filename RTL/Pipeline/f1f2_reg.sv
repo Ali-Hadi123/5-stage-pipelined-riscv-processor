@@ -5,7 +5,7 @@ module f1f2_reg(
     input logic rst,
     input logic stall,
     input f1f2_reg_t d_in,
-    output f1f2_reg_t d_out,
+    output f1f2_reg_t d_out
 );
 
     function automatic f1f2_reg_t bubble();

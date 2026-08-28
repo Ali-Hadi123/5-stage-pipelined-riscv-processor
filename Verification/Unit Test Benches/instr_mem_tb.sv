@@ -109,5 +109,5 @@ module imem_tb;
     $display("INSTRUCTION MEMORY TESTING COMPLETE!");
     $display("Results: %0d/%0d tests passed.", passed_tests, total_tests);
   end
-  $finish(1);
+  $finish;
 endmodule

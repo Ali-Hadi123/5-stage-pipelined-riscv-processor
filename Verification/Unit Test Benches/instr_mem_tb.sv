@@ -14,6 +14,8 @@ module imem_tb;
   logic [XLEN-1:0] default_pc_addr;
   logic [XLEN-1:0] default_instr;
 
+  assign stall = 1'b0;
+
   imem #(                         //DUV1: IMEM when nothing is uploaded.
     .init_mem(""),
     .rom_size(1024)

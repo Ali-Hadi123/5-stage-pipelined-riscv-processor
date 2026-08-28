@@ -174,6 +174,11 @@ package riscv_pkg;
   //Structs for pipelined registers.
 
   typedef struct packed {
+    logic [XLEN-1:0] pc;
+    logic [XLEN-1:0] pc_plus4;
+  } f1f2_reg_t;
+
+  typedef struct packed {
     logic [XLEN-1:0] instr;
     logic [XLEN-1:0] pc;
     logic [XLEN-1:0] pc_plus4;

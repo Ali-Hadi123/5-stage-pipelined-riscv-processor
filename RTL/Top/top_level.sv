@@ -31,6 +31,26 @@ module top #(
         .pc_out(pc_out)
     );
 
+    logic [XLEN-1:0] pc_plus4F1;
+
+    adder #(.WIDTH(XLEN)) u_pc_plus4_adder(
+        .a(pc_out),
+        .b(XLEN'(4)),
+        .sum(pc_plus4F1)
+    );
+
+    f1f2_reg_t f1f2_in, f1f2_out;
+    assign f1f2_in.pc = pc_out;
+    assign f1f2_in.pc_plus4 = pc_plus4F1;
+
+    f1f2_reg u_f1f2_reg(
+        .clk(clk),
+        .rst(rst),
+        .stall(stallD),
+        .d_in(f1f2_in),
+        .d_out(f1f2_out)
+    );
+
     logic [XLEN-1:0] instrF;
 
     imem #(
@@ -41,18 +61,10 @@ module top #(
         .instr(instrF)
     );
 
-    logic [XLEN-1:0] pc_plus4F;
-
-    adder #(.WIDTH(XLEN)) u_pc_plus4_adder(
-        .a(pc_out),
-        .b(XLEN'(4)),
-        .sum(pc_plus4F)
-    );
-
     fd_reg_t fd_in, fd_out;
     assign fd_in.instr = instrF;
-    assign fd_in.pc = pc_out;
-    assign fd_in.pc_plus4 = pc_plus4F;
+    assign fd_in.pc = f1f2_out.pc;
+    assign fd_in.pc_plus4 = f1f2_out.pc_plus4;
 
     fd_reg u_fd_reg(
         .clk(clk),
@@ -273,7 +285,7 @@ module top #(
     logic [XLEN-1:0] pc_mux_outE;
 
     mux3 #(.WIDTH(XLEN)) u_pc_mux(
-        .a(pc_plus4F),
+        .a(pc_plus4F1),
         .b(pc_targetE),
         .c(alu_resultE),
         .sel(pc_srcE),

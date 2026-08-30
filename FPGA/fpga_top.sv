@@ -2,7 +2,7 @@ import riscv_pkg::*;
 
 module fpga_top #(
     parameter int unsigned ram_size = 1024,
-    parameter int unsigned rom_size = 39,
+    parameter int unsigned rom_size = 80,
     parameter init_mem = "prime_sieve_uart.hex",
     parameter int unsigned CLKS_PER_BIT = 10417 
 )(

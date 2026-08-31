@@ -4,7 +4,7 @@ module m1m2_reg(
     input logic clk,
     input logic rst,
     input m1m2_reg_t d_in,
-    output m1m2_reg_t d_out,
+    output m1m2_reg_t d_out
 );
 
     function automatic f1f2_reg_t bubble();

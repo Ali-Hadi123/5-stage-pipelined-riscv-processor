@@ -375,7 +375,7 @@ module top #(
     assign m1m2_in.alu_result    = em_out.alu_result;
     assign m1m2_in.rd_addr       = em_out.rd_addr;
     assign m1m2_in.pc_target     = em_out.pc_target;
-    assign m1m2_in.pc_plus4      = em_out.pc_plus4
+    assign m1m2_in.pc_plus4      = em_out.pc_plus4;
     assign m1m2_in.result_src    = em_out.result_src;
     assign m1m2_in.reg_write     = em_out.reg_write;
     assign m1m2_in.illegal_instr = em_out.illegal_instr;

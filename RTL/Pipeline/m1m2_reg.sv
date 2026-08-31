@@ -7,7 +7,7 @@ module m1m2_reg(
     output m1m2_reg_t d_out
 );
 
-    function automatic f1f2_reg_t bubble();
+    function automatic m1m2_reg_t bubble();
         bubble.alu_result    = '0;
         bubble.rd_addr       = '0;
         bubble.pc_target     = '0;

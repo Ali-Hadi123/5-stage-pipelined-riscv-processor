@@ -7,13 +7,13 @@ module fpga_top #(
     parameter int unsigned CLKS_PER_BIT = 10417 
 )(
     input logic clk,
-    input logic btnU,
+    input logic btnC,
     output logic RsTx,
     output logic [1:0] led
 );
 
     logic rst;
-    assign rst = btnU;
+    assign rst = btnC;
 
     logic illegal_instr;
 

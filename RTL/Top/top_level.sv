@@ -206,33 +206,41 @@ module top #(
     fwd_unit u_fwd_unit(
         .rs1E(de_out.rs1_addr),
         .rs2E(de_out.rs2_addr),
-        .rdM(em_out.rd_addr),
+        .rdM1(em_out.rd_addr),
+        .rdM2(m1m2_out.rd_addr),
         .rdW(mw_out.rd_addr),
-        .reg_writeM(em_out.reg_write),
+        .reg_writeM1(em_out.reg_write),
+        .reg_writeM2(m1m2_out.reg_write),
         .reg_writeW(mw_out.reg_write),
         .fwdA(fwdA),
         .fwdB(fwdB)
     );
 
-    logic [XLEN-1:0] fwd_dataM;
-    assign fwd_dataM = (em_out.result_src == RESULT_PCPLUS4)  ? em_out.pc_plus4  :
+    logic [XLEN-1:0] fwd_dataM1, fwd_dataM2;
+    assign fwd_dataM1 = (em_out.result_src == RESULT_PCPLUS4)  ? em_out.pc_plus4  :
                         (em_out.result_src == RESULT_PCTARGET) ? em_out.pc_target :
                         em_out.alu_result;
 
+    assign fwd_dataM2 = (m1m2_out.result_src == RESULT_PCPLUS4)  ? m1m2_out.pc_plus4  :
+                        (m1m2_out.result_src == RESULT_PCTARGET) ? m1m2_out.pc_target :
+                        m1m2_out.alu_result;
+
     logic [XLEN-1:0] fwd_rdata1E, fwd_rdata2E;
 
-    mux3 #(.WIDTH(XLEN)) u_fwdA_mux(
+    mux4 #(.WIDTH(XLEN)) u_fwdA_mux(
         .a(de_out.rdata1),
         .b(wb_data),
-        .c(fwd_dataM),
+        .c(fwd_dataM1),
+        .d(fwd_dataM2),
         .sel(fwdA),
         .result(fwd_rdata1E)
     );
  
-    mux3 #(.WIDTH(XLEN)) u_fwdB_mux(
+    mux4 #(.WIDTH(XLEN)) u_fwdB_mux(
         .a(de_out.rdata2),
         .b(wb_data),
-        .c(fwd_dataM),
+        .c(fwd_dataM1),
+        .d(fwd_dataM2),
         .sel(fwdB),
         .result(fwd_rdata2E)
     );

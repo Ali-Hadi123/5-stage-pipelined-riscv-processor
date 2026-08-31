@@ -119,13 +119,15 @@ package riscv_pkg;
   typedef enum logic [1:0] {
     FWD_NONE_A,
     FWD_WB_A,
-    FWD_MEM_A
+    FWD_MEM1_A,
+    FWD_MEM2_A
   } fwdA_e;
 
   typedef enum logic [1:0] {
     FWD_NONE_B,
     FWD_WB_B,
-    FWD_MEM_B
+    FWD_MEM1_B,
+    FWD_MEM2_B
   } fwdB_e;
 
   //Instruction field extraction helpers.

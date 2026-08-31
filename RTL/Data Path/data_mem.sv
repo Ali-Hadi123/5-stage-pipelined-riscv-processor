@@ -61,16 +61,17 @@ module dmem #(
 
       endcase
     end
+  end
 
+  //Code for reading data (load instructions):
+
+  always_ff @(posedge clk) begin
     byte_off_reg <= byte_off;
     windex_reg <= windex;
     mem_size_reg <= mem_size;
     mem_read_reg <= mem_read;
     mem_unsigned_reg <= mem_unsigned;
-
   end
-
-  //Code for reading data (load instructions):
   
   logic [31:0] rword;
   logic [15:0] rhalf;

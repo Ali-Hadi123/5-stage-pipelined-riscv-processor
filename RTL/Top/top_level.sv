@@ -371,15 +371,31 @@ module top #(
         .read_data(mem_read_dataM)
     );
 
+    m1m2_reg_t m1m2_in, m1m2_out;
+    assign m1m2_in.alu_result    = em_out.alu_result;
+    assign m1m2_in.rd_addr       = em_out.rd_addr;
+    assign m1m2_in.pc_target     = em_out.pc_target;
+    assign m1m2_in.pc_plus4      = em_out.pc_plus4
+    assign m1m2_in.result_src    = em_out.result_src;
+    assign m1m2_in.reg_write     = em_out.reg_write;
+    assign m1m2_in.illegal_instr = em_out.illegal_instr;
+
+    m1m2_reg u_m1m2_reg(
+        .clk(clk),
+        .rst(rst),
+        .d_in(m1m2_in),
+        .d_out(m1m2_out)
+    );
+
     mw_reg_t mw_in, mw_out;
-    assign mw_in.mem_rdata    = mem_read_dataM;
-    assign mw_in.alu_result   = em_out.alu_result;
-    assign mw_in.pc_plus4     = em_out.pc_plus4;
-    assign mw_in.pc_target    = em_out.pc_target;
-    assign mw_in.rd_addr      = em_out.rd_addr;
-    assign mw_in.reg_write    = em_out.reg_write;
-    assign mw_in.result_src   = em_out.result_src;
-    assign mw_in.illegal_instr = em_out.illegal_instr;
+    assign mw_in.mem_rdata     = mem_read_dataM;
+    assign mw_in.alu_result    = m1m2_out.alu_result;
+    assign mw_in.pc_plus4      = m1m2_out.pc_plus4;
+    assign mw_in.pc_target     = m1m2_out.pc_target;
+    assign mw_in.rd_addr       = m1m2_out.rd_addr;
+    assign mw_in.reg_write     = m1m2_out.reg_write;
+    assign mw_in.result_src    = m1m2_out.result_src;
+    assign mw_in.illegal_instr = m1m2_out.illegal_instr;
     
     mw_reg u_mw_reg(
         .clk(clk),

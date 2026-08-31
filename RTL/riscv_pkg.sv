@@ -232,6 +232,18 @@ package riscv_pkg;
   } em_reg_t;
 
   typedef struct packed {
+    logic [XLEN-1:0] alu_result;
+    logic [REG_ADDR_W-1:0] rd_addr;
+    logic [XLEN-1:0] pc_target;
+    logic [XLEN-1:0] pc_plus4;
+
+    result_src_e result_src;
+    logic reg_write;
+
+    logic illegal_instr;
+  } m1m2_reg_t;
+
+  typedef struct packed {
     logic [XLEN-1:0] mem_rdata;
     logic [XLEN-1:0] alu_result;
     logic [XLEN-1:0] pc_plus4;

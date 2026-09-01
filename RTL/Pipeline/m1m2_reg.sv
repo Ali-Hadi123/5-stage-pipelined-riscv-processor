@@ -12,7 +12,7 @@ module m1m2_reg(
         bubble.rd_addr       = '0;
         bubble.pc_target     = '0;
         bubble.pc_plus4      = '0;
-        bubble.result_src    = '0;
+        bubble.result_src    = RESULT_ALU;
         bubble.reg_write     = '0;
         bubble.illegal_instr = '0;
     endfunction

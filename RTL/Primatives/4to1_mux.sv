@@ -4,14 +4,6 @@ module mux4 #(parameter WIDTH = 32) (
   output logic [WIDTH-1:0] result
 );
 
-  always_comb begin
-    unique case(sel)
-      2'b00: result = a;
-      2'b01: result = b;
-      2'b10: result = c;
-      2'b11: result = d;
-      default: result = {WIDTH{1'b0}};
-    endcase
-  end
+  assign result = (sel == 2'b00) ? a : (sel == 2'b01) ? b : (sel == 2'b10) ? c : d;
 
 endmodule

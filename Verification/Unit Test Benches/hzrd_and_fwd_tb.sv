@@ -2,8 +2,8 @@ import riscv_pkg::*;
 `timescale 1ns/1ps
 
 module hazard_tb;
-  logic [REG_ADDR_W-1:0] fwd_rs1E, fwd_rs2E, fwd_rdM, fwd_rdW;
-  logic fwd_reg_writeM, fwd_reg_writeW;
+  logic [REG_ADDR_W-1:0] fwd_rs1E, fwd_rs2E, fwd_rdM1, fwd_rdM2, fwd_rdW;
+  logic fwd_reg_writeM1, fwd_reg_writeM2, fwd_reg_writeW;
   fwdA_e fwd_fwdA;
   fwdB_e fwd_fwdB;
 
@@ -15,17 +15,19 @@ module hazard_tb;
   fwd_unit duv_fwd(
     .rs1E(fwd_rs1E),
     .rs2E(fwd_rs2E),
-    .rdM(fwd_rdM),
+    .rdM1(fwd_rdM1),
+    .rdM2(fwd_rdM2),
     .rdW(fwd_rdW),
-    .reg_writeM(fwd_reg_writeM),
+    .reg_writeM1(fwd_reg_writeM1),
+    .reg_writeM2(fwd_reg_writeM2),
     .reg_writeW(fwd_reg_writeW),
     .fwdA(fwd_fwdA),
     .fwdB(fwd_fwdB)
   );
 
   task verify_fwd(
-    input logic [REG_ADDR_W-1:0] rs1E, rs2E, rdM, rdW,
-    input logic reg_writeM, reg_writeW,
+    input logic [REG_ADDR_W-1:0] rs1E, rs2E, rdM1, rdM2, rdW,
+    input logic reg_writeM1, reg_writeM2, reg_writeW,
     input fwdA_e exp_fwdA,
     input fwdB_e exp_fwdB,
     input string test_name
@@ -33,9 +35,11 @@ module hazard_tb;
 
     fwd_rs1E = rs1E;
     fwd_rs2E = rs2E;
-    fwd_rdM = rdM;
+    fwd_rdM1 = rdM1;
+    fwd_rdM2 = rdM2;
     fwd_rdW = rdW;
-    fwd_reg_writeM = reg_writeM;
+    fwd_reg_writeM1 = reg_writeM1;
+    fwd_reg_writeM2 = reg_writeM2;
     fwd_reg_writeW = reg_writeW;
 
     #10;
@@ -108,8 +112,8 @@ module hazard_tb;
     $dumpvars(0, hazard_tb);
 
     //Clearing all signals before testing.
-    fwd_rs1E = 0; fwd_rs2E = 0; fwd_rdM = 0; fwd_rdW = 0;
-    fwd_reg_writeM = 0; fwd_reg_writeW = 0;
+    fwd_rs1E = 0; fwd_rs2E = 0; fwd_rdM1 = 0; fwd_rdM2 = 0; fwd_rdW = 0;
+    fwd_reg_writeM1 = 0; fwd_reg_writeM2 = 0; fwd_reg_writeW = 0;
 
     hzrd_mem_readE = 0;
     hzrd_rs1D = 0; hzrd_rs2D = 0; hzrd_rdE = 0;
@@ -121,26 +125,29 @@ module hazard_tb;
     
     $display("FORWARDING TESTING:");
 
-    verify_fwd(5'd1, 5'd2, 5'd3, 5'd4, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 1: No hazard, no forwarding"); //Testing that unrelated regs don't forward.
-    verify_fwd(5'd5, 5'd2, 5'd5, 5'd0, 1'b1, 1'b0, FWD_MEM_A, FWD_NONE_B, "Test 2: rs1E forwards from MEM"); //Testing rs1E == rdM forwards from MEM stage.
-    verify_fwd(5'd5, 5'd2, 5'd3, 5'd5, 1'b1, 1'b1, FWD_WB_A, FWD_NONE_B, "Test 3: rs1E forwards from WB"); //Testing rs1E == rdW (no M match) forwards from WB stage.
-    verify_fwd(5'd0, 5'd2, 5'd0, 5'd0, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 4: x0 never forwards (rs1E)"); //Testing that x0 is never forwarded even on a match.
-    verify_fwd(5'd1, 5'd7, 5'd7, 5'd0, 1'b1, 1'b0, FWD_NONE_A, FWD_MEM_B, "Test 5: rs2E forwards from MEM"); //Testing rs2E == rdM forwards from MEM stage.
-    verify_fwd(5'd1, 5'd7, 5'd3, 5'd7, 1'b1, 1'b1, FWD_NONE_A, FWD_WB_B, "Test 6: rs2E forwards from WB"); //Testing rs2E == rdW (no M match) forwards from WB stage.
-    verify_fwd(5'd0, 5'd0, 5'd0, 5'd0, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 7: x0 never forwards (rs2E)"); //Testing that x0 is never forwarded on rs2E either.
-    verify_fwd(5'd5, 5'd6, 5'd5, 5'd5, 1'b0, 1'b1, FWD_WB_A, FWD_NONE_B, "Test 8: MEM forwarding ignored when reg_writeM is low"); //Testing that a matching rdM doesn't forward if reg_writeM is deasserted, falling through to WB.
-    verify_fwd(5'd5, 5'd6, 5'd5, 5'd5, 1'b1, 1'b1, FWD_MEM_A, FWD_NONE_B, "Test 9: MEM takes priority over WB"); //Testing that MEM forwarding takes priority when both MEM and WB match.
+    verify_fwd(5'd1, 5'd2, 5'd3, 5'd4, 5'd6, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 1: No hazard, no forwarding"); //Testing that unrelated regs don't forward.
+    verify_fwd(5'd5, 5'd2, 5'd5, 5'd0, 5'd0, 1'b1, 1'b0, 1'b0, FWD_MEM1_A, FWD_NONE_B, "Test 2: rs1E forwards from MEM1"); //Testing rs1E == rdM1 forwards from the first MEM stage.
+    verify_fwd(5'd5, 5'd2, 5'd3, 5'd5, 5'd0, 1'b1, 1'b1, 1'b0, FWD_MEM2_A, FWD_NONE_B, "Test 3: rs1E forwards from MEM2"); //Testing rs1E == rdM2 (no M1 match) forwards from the second MEM stage.
+    verify_fwd(5'd5, 5'd2, 5'd3, 5'd4, 5'd5, 1'b1, 1'b1, 1'b1, FWD_WB_A, FWD_NONE_B, "Test 4: rs1E forwards from WB"); //Testing rs1E == rdW (no M1/M2 match) forwards from WB stage.
+    verify_fwd(5'd0, 5'd2, 5'd0, 5'd0, 5'd0, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 5: x0 never forwards (rs1E)"); //Testing that x0 is never forwarded even on a match.
+    verify_fwd(5'd1, 5'd7, 5'd7, 5'd0, 5'd0, 1'b1, 1'b0, 1'b0, FWD_NONE_A, FWD_MEM1_B, "Test 6: rs2E forwards from MEM1"); //Testing rs2E == rdM1 forwards from the first MEM stage.
+    verify_fwd(5'd1, 5'd7, 5'd3, 5'd7, 5'd0, 1'b1, 1'b1, 1'b0, FWD_NONE_A, FWD_MEM2_B, "Test 7: rs2E forwards from MEM2"); //Testing rs2E == rdM2 (no M1 match) forwards from the second MEM stage.
+    verify_fwd(5'd1, 5'd7, 5'd3, 5'd4, 5'd7, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_WB_B, "Test 8: rs2E forwards from WB"); //Testing rs2E == rdW (no M1/M2 match) forwards from WB stage.
+    verify_fwd(5'd0, 5'd0, 5'd0, 5'd0, 5'd0, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 9: x0 never forwards (rs2E)"); //Testing that x0 is never forwarded on rs2E either.
+    verify_fwd(5'd5, 5'd6, 5'd5, 5'd6, 5'd5, 1'b1, 1'b1, 1'b1, FWD_MEM1_A, FWD_MEM1_B, "Test 10: MEM1 takes priority over MEM2 and WB"); //Testing that MEM1 forwarding wins when M1, M2, and WB all match.
+    verify_fwd(5'd5, 5'd6, 5'd5, 5'd6, 5'd5, 1'b0, 1'b1, 1'b1, FWD_MEM2_A, FWD_MEM2_B, "Test 11: MEM2 takes priority over WB when MEM1 is inactive"); //Testing that a matching rdM1 doesn't forward if reg_writeM1 is deasserted, falling through to MEM2 which takes priority over WB.
+    verify_fwd(5'd5, 5'd6, 5'd5, 5'd6, 5'd5, 1'b0, 1'b0, 1'b1, FWD_WB_A, FWD_WB_B, "Test 12: WB used when MEM1 and MEM2 are both inactive"); //Testing that with reg_writeM1 and reg_writeM2 both deasserted, forwarding falls all the way through to WB.
 
     $display("HAZARD UNIT TESTING:");
 
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 10: No hazard, no stall/flush"); //Testing the default, no-hazard case.
-    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 11: Load-use hazard on rs1D"); //Testing a load-use hazard through rs1D stalls fetch/decode and flushes execute.
-    verify_hzrd(1'b1, 5'd2, 5'd6, 5'd6, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 12: Load-use hazard on rs2D"); //Testing a load-use hazard through rs2D.
-    verify_hzrd(1'b1, 5'd0, 5'd0, 5'd0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 13: Load-use hazard ignored for x0"); //Testing that a load-use hazard targeting x0 is ignored.
-    verify_hzrd(1'b1, 5'd1, 5'd2, 5'd9, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 14: mem_readE with no matching rs1D/rs2D"); //Testing that a load in EX with no dependent regs in ID causes no stall.
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_TARGET, 1'b0, 1'b0, 1'b1, 1'b1, "Test 15: Branch misprediction flushes D and E"); //Testing a taken branch (PC_TARGET) causes flushD and flushE, no stalling.
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_RESULT, 1'b0, 1'b0, 1'b1, 1'b1, "Test 16: JALR misprediction flushes D and E"); //Testing PC_RESULT (JALR) also causes flushD and flushE.
-    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_TARGET, 1'b1, 1'b1, 1'b1, 1'b1, "Test 17: Simultaneous load-use hazard and branch misprediction"); //Testing that both hazards together stall fetch/decode and flush both D and E.
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 13: No hazard, no stall/flush"); //Testing the default, no-hazard case.
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 14: Load-use hazard on rs1D"); //Testing a load-use hazard through rs1D stalls fetch/decode and flushes execute.
+    verify_hzrd(1'b1, 5'd2, 5'd6, 5'd6, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 15: Load-use hazard on rs2D"); //Testing a load-use hazard through rs2D.
+    verify_hzrd(1'b1, 5'd0, 5'd0, 5'd0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 16: Load-use hazard ignored for x0"); //Testing that a load-use hazard targeting x0 is ignored.
+    verify_hzrd(1'b1, 5'd1, 5'd2, 5'd9, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 17: mem_readE with no matching rs1D/rs2D"); //Testing that a load in EX with no dependent regs in ID causes no stall.
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_TARGET, 1'b0, 1'b0, 1'b1, 1'b1, "Test 18: Branch misprediction flushes D and E"); //Testing a taken branch (PC_TARGET) causes flushD and flushE, no stalling.
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_RESULT, 1'b0, 1'b0, 1'b1, 1'b1, "Test 19: JALR misprediction flushes D and E"); //Testing PC_RESULT (JALR) also causes flushD and flushE.
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_TARGET, 1'b1, 1'b1, 1'b1, 1'b1, "Test 20: Simultaneous load-use hazard and branch misprediction"); //Testing that both hazards together stall fetch/decode and flush both D and E.
 
     $display("HAZARD/FORWARDING UNIT TESTING COMPLETE!");
     $display("Results: %0d/%0d tests passed.", passed_tests, total_tests);

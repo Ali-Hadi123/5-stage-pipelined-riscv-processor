@@ -138,7 +138,7 @@ module hazard_tb;
     verify_fwd(5'd5, 5'd0, 5'd5, 5'd5, 5'd5, 1'b0, 1'b1, 1'b1, FWD_MEM2_A, FWD_NONE_B, "Test 11: MEM2 takes priority over WB when MEM1 is inactive (rs1E)"); //Testing that a matching rdM1 doesn't forward if reg_writeM1 is deasserted, falling through to MEM2 which takes priority over WB.
     verify_fwd(5'd5, 5'd0, 5'd5, 5'd5, 5'd5, 1'b0, 1'b0, 1'b1, FWD_WB_A, FWD_NONE_B, "Test 12: WB used when MEM1 and MEM2 are both inactive (rs1E)"); //Testing that with reg_writeM1 and reg_writeM2 both deasserted, fwdA falls all the way through to WB.
     verify_fwd(5'd0, 5'd6, 5'd6, 5'd6, 5'd6, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_MEM1_B, "Test 13: MEM1 takes priority over MEM2 and WB (rs2E)"); //Testing that fwdB picks MEM1 when rdM1, rdM2, and rdW all match rs2E.
-    verify_fwd(5'd0, 5'd6, 5'd6, 5'd6, 5'd6, 1'b1, 1'b0, 1'b1, FWD_NONE_A, FWD_MEM2_B, "Test 14: MEM2 takes priority over WB when MEM1 is inactive (rs2E)"); //Testing that a matching rdM1 doesn't forward if reg_writeM1 is deasserted, falling through to MEM2 which takes priority over WB.
+    verify_fwd(5'd0, 5'd6, 5'd6, 5'd6, 5'd6, 1'b0, 1'b1, 1'b1, FWD_NONE_A, FWD_MEM2_B, "Test 14: MEM2 takes priority over WB when MEM1 is inactive (rs2E)"); //Testing that a matching rdM1 doesn't forward if reg_writeM1 is deasserted, falling through to MEM2 which takes priority over WB.
     verify_fwd(5'd0, 5'd6, 5'd6, 5'd6, 5'd6, 1'b0, 1'b0, 1'b1, FWD_NONE_A, FWD_WB_B, "Test 15: WB used when MEM1 and MEM2 are both inactive (rs2E)"); //Testing that with reg_writeM1 and reg_writeM2 both deasserted, fwdB falls all the way through to WB.
 
     $display("HAZARD UNIT TESTING:");

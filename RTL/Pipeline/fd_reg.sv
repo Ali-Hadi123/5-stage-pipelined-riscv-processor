@@ -22,10 +22,10 @@ module fd_reg(
       end
 
       if (flush)
-        d_oout.instr <= 32'h0000_0013;
+        d_out.instr <= 32'h0000_0013;
       else if (~stall)
         d_out.instr <= d_in.instr;
     end
   end
-  
+
 endmodule

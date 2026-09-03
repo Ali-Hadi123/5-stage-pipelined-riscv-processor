@@ -10,4 +10,4 @@ set_property MAX_FANOUT 8 \
     [get_cells -hierarchical -filter {NAME =~ "*u_de_reg/d_out_reg[rs1_addr]*" || NAME =~ "*u_de_reg/d_out_reg[rs2_addr]*"}]
 
 set_property MAX_FANOUT 16 \
-    [get_nets -hierarchical -filter {NAME =~ "*pc_srcE*" || NAME =~ "*halt_pc*" || NAME =~ "*halt_fdflush*" || NAME =~ "*halt_deflush*"}]
+    [get_nets -hierarchical -filter {NAME =~ "*pc_srcE*"}]

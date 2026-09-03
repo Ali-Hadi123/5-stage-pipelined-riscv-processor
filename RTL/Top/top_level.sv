@@ -17,7 +17,7 @@ module top #(
     //Pipeline control signals:
     logic stallF, stallD;
     logic flushD, flushE;
-    logic halt;
+    logic halt_pc, halt_fd_flush, halt_de_flush; //Signal replication to decrease fanout.
 
     //Fetch Stage:
 
@@ -73,7 +73,7 @@ module top #(
         .clk(clk),
         .rst(rst),
         .stall(stallD),
-        .flush(flushD || flush_end),
+        .flush(flushD || halt_fd_flush),
         .d_in(fd_in),
         .d_out(fd_out)
     );
@@ -192,7 +192,7 @@ module top #(
     de_reg u_de_reg(
         .clk(clk),
         .rst(rst),
-        .flush(flushE || flush_end),
+        .flush(flushE || halt_de_flush),
         .d_in(de_in),
         .d_out(de_out)
     );
@@ -275,14 +275,22 @@ module top #(
         .illegal_instr_branch(illegal_instr_branchE)
     );
 
-    pc_src_e pc_srcE;
+    pc_src_e pc_srcE, pc_srcE_hzrd; //Signal replication to decrease fanout.
 
-    pc_comp u_pc_comp(
+    (* dont_merge *) pc_comp u_pc_comp(
         .is_branch(de_out.is_branch),
         .branch_taken(branch_takenE),
         .is_jal(de_out.is_jal),
         .is_jalr(de_out.is_jalr),
         .pc_src(pc_srcE)
+    );
+
+    (* dont_merge *) pc_comp u_pc_comp_hzrd(
+        .is_branch(de_out.is_branch),
+        .branch_taken(branch_takenE),
+        .is_jal(de_out.is_jal),
+        .is_jalr(de_out.is_jalr),
+        .pc_src(pc_srcE_hzrd)
     );
 
     logic [XLEN-1:0] pc_targetE;
@@ -307,18 +315,29 @@ module top #(
     assign next_pc_normal = {pc_mux_outE[XLEN-1:1], 1'b0};  //LSB cleared for JALR.
     
     //Freeze PC in case of illegal instruction:
-    assign next_pc = halt ? pc_out : next_pc_normal;
+    assign next_pc = halt_pc ? pc_out : next_pc_normal;
 
     assign illegal_instr = de_out.illegal_instr_main | de_out.illegal_instr_alu | de_out.illegal_instr_mem | (de_out.is_branch & illegal_instr_branchE);
 
-    logic flush_end;
-    assign flush_end = halt ? 1'b1 : 1'b0;
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst)
+            halt_pc <= 1'b0;
+        else if (illegal_instr)
+            halt_pc <= 1'b1;
+    end
 
     always_ff @(posedge clk or posedge rst) begin
         if (rst)
-            halt <= 1'b0;
+            halt_fd_flush <= 1'b0;
         else if (illegal_instr)
-            halt <= 1'b1;
+            halt_fd_flush <= 1'b1;
+    end
+
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst)
+            halt_de_flush <= 1'b0;
+        else if (illegal_instr)
+            halt_de_flush <= 1'b1;
     end
 
     //Hazard Unit Logic:
@@ -327,7 +346,7 @@ module top #(
         .rs1D(rs1_addrD),
         .rs2D(rs2_addrD),
         .rdE(de_out.rd_addr),
-        .pc_srcE(pc_srcE),
+        .pc_srcE(pc_srcE_hzrd),
         .stallF(stallF),
         .stallD(stallD),
         .flushD(flushD),

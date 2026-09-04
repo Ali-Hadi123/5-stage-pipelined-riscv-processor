@@ -319,7 +319,7 @@ module top #(
         .rs1D(rs1_addrD),
         .rs2D(rs2_addrD),
         .rdE(de_out.rd_addr),
-        .pc_srcE(pc_srcE_hzrd),
+        .pc_srcM(pc_srcM_hzrd),
         .stallF(stallF),
         .stallD(stallD),
         .flushD(flushD),

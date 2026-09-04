@@ -59,7 +59,7 @@ module hazard_tb;
 
   logic hzrd_mem_readE;
   logic [REG_ADDR_W-1:0] hzrd_rs1D, hzrd_rs2D, hzrd_rdE;
-  pc_src_e hzrd_pc_srcE;
+  pc_src_e hzrd_pc_srcM;
   logic hzrd_stallF, hzrd_stallD, hzrd_flushD, hzrd_flushE;
 
   hzrd_unit duv_hzrd(
@@ -67,7 +67,7 @@ module hazard_tb;
     .rs1D(hzrd_rs1D),
     .rs2D(hzrd_rs2D),
     .rdE(hzrd_rdE),
-    .pc_srcE(hzrd_pc_srcE),
+    .pc_srcM(hzrd_pc_srcM),
     .stallF(hzrd_stallF),
     .stallD(hzrd_stallD),
     .flushD(hzrd_flushD),
@@ -77,7 +77,7 @@ module hazard_tb;
   task verify_hzrd(
     input logic mem_readE,
     input logic [REG_ADDR_W-1:0] rs1D, rs2D, rdE,
-    input pc_src_e pc_srcE,
+    input pc_src_e pc_srcM,
     input logic exp_stallF, exp_stallD, exp_flushD, exp_flushE,
     input string test_name
   );
@@ -86,7 +86,7 @@ module hazard_tb;
     hzrd_rs1D = rs1D;
     hzrd_rs2D = rs2D;
     hzrd_rdE = rdE;
-    hzrd_pc_srcE = pc_srcE;
+    hzrd_pc_srcM = pc_srcM;
 
     #10;
 
@@ -117,7 +117,7 @@ module hazard_tb;
 
     hzrd_mem_readE = 0;
     hzrd_rs1D = 0; hzrd_rs2D = 0; hzrd_rdE = 0;
-    hzrd_pc_srcE = PC_PLUS4;
+    hzrd_pc_srcM = PC_PLUS4;
 
     #10;
 

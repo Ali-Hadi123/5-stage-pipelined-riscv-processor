@@ -16,8 +16,8 @@ module top #(
 
     //Pipeline control signals:
     logic stallF, stallD;
-    logic flushD, flushE;
-    logic halt_pc, halt_fd_flush, halt_de_flush; //Signal replication to decrease fanout.
+    logic flushD, flushE, flushM;
+    logic halt_pc, halt_fd_flush, halt_de_flush, halt_em_flush; //Signal replication to decrease fanout.
 
     //Fetch Stage:
 
@@ -275,24 +275,6 @@ module top #(
         .illegal_instr_branch(illegal_instr_branchE)
     );
 
-    pc_src_e pc_srcE, pc_srcE_hzrd; //Signal replication to decrease fanout.
-
-    (* dont_merge *) pc_comp u_pc_comp(
-        .is_branch(de_out.is_branch),
-        .branch_taken(branch_takenE),
-        .is_jal(de_out.is_jal),
-        .is_jalr(de_out.is_jalr),
-        .pc_src(pc_srcE)
-    );
-
-    (* dont_merge *) pc_comp u_pc_comp_hzrd(
-        .is_branch(de_out.is_branch),
-        .branch_taken(branch_takenE),
-        .is_jal(de_out.is_jal),
-        .is_jalr(de_out.is_jalr),
-        .pc_src(pc_srcE_hzrd)
-    );
-
     logic [XLEN-1:0] pc_targetE;
 
     adder #(.WIDTH(XLEN)) u_pc_target_adder(
@@ -300,22 +282,6 @@ module top #(
         .b(de_out.imm_out),
         .sum(pc_targetE)
     );
-
-    logic [XLEN-1:0] pc_mux_outE;
-
-    mux3 #(.WIDTH(XLEN)) u_pc_mux(
-        .a(pc_plus4F1),
-        .b(pc_targetE),
-        .c(alu_resultE),
-        .sel(pc_srcE),
-        .result(pc_mux_outE)
-    );
-
-    logic [XLEN-1:0] next_pc_normal;
-    assign next_pc_normal = {pc_mux_outE[XLEN-1:1], 1'b0};  //LSB cleared for JALR.
-    
-    //Freeze PC in case of illegal instruction:
-    assign next_pc = halt_pc ? pc_out : next_pc_normal;
 
     assign illegal_instr = de_out.illegal_instr_main | de_out.illegal_instr_alu | de_out.illegal_instr_mem | (de_out.is_branch & illegal_instr_branchE);
 
@@ -340,6 +306,13 @@ module top #(
             halt_de_flush <= 1'b1;
     end
 
+    always_ff @(posedge clk or posedge rst) begin
+        if (rst)
+            halt_em_flush <= 1'b0;
+        else if (illegal_instr)
+            halt_em_flush <= 1'b1;
+    end
+
     //Hazard Unit Logic:
     hzrd_unit u_hzrd_unit(
         .mem_readE(de_out.mem_read),
@@ -350,7 +323,8 @@ module top #(
         .stallF(stallF),
         .stallD(stallD),
         .flushD(flushD),
-        .flushE(flushE)
+        .flushE(flushE),
+        .flushM(flushM)
     );
 
     em_reg_t em_in, em_out;
@@ -366,16 +340,55 @@ module top #(
     assign em_in.mem_size     = de_out.mem_size;
     assign em_in.mem_unsigned = de_out.mem_unsigned;
     assign em_in.reg_write    = de_out.reg_write;
+    assign em_in.is_branch    = de_out.is_branch;
+    assign em_in.is_jal       = de_out.is_jal;
+    assign em_in.is_jalr      = de_out.is_jalr;
+    assign em_in.branch_taken = branch_takenE;
     assign em_in.illegal_instr = illegal_instr;
     
     em_reg u_em_reg(
         .clk(clk),
         .rst(rst),
+        .flush(flushM || halt_em_flush),
         .d_in(em_in),
         .d_out(em_out)
     );
 
     //Memory Stage:
+
+    pc_src_e pc_srcM, pc_srcM_hzrd; //Signal replication to decrease fanout.
+
+    (* dont_merge *) pc_comp u_pc_comp(
+        .is_branch(em_out.is_branch),
+        .branch_taken(em_out.branch_taken),
+        .is_jal(em_out.is_jal),
+        .is_jalr(em_out.is_jalr),
+        .pc_src(pc_srcM)
+    );
+
+    (* dont_merge *) pc_comp u_pc_comp_hzrd(
+        .is_branch(em_out.is_branch),
+        .branch_taken(em_out.branch_taken),
+        .is_jal(em_out.is_jal),
+        .is_jalr(em_out.is_jalr),
+        .pc_src(pc_srcM_hzrd)
+    );
+
+    logic [XLEN-1:0] pc_mux_outM;
+
+    mux3 #(.WIDTH(XLEN)) u_pc_mux(
+        .a(pc_plus4F1),
+        .b(em_out.pc_target),
+        .c(em_out.alu_result),
+        .sel(pc_srcM),
+        .result(pc_mux_outM)
+    );
+
+    logic [XLEN-1:0] next_pc_normal;
+    assign next_pc_normal = {pc_mux_outM[XLEN-1:1], 1'b0};  //LSB cleared for JALR.
+    
+    //Freeze PC in case of illegal instruction:
+    assign next_pc = halt_pc ? pc_out : next_pc_normal;
 
     logic mem_read_safeM, mem_write_safeM;
     assign mem_read_safeM  = em_out.mem_read  & ~em_out.illegal_instr;

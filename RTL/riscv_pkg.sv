@@ -230,6 +230,11 @@ package riscv_pkg;
     logic mem_unsigned;
     logic reg_write;
 
+    logic is_branch;
+    logic is_jal;
+    logic is_jalr;
+    logic branch_taken;
+
     logic illegal_instr;
   } em_reg_t;
 

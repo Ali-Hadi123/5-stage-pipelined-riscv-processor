@@ -3,6 +3,7 @@ import riscv_pkg::*;
 module em_reg(
     input logic clk,
     input logic rst,
+    input logic flush,
     input em_reg_t d_in,
     output em_reg_t d_out
 );
@@ -26,7 +27,7 @@ module em_reg(
     endfunction
 
     always_ff @(posedge clk or posedge rst) begin
-        if (rst)
+        if (rst || flush)
             d_out <= bubble();
         else
             d_out <= d_in;

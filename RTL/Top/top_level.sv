@@ -203,7 +203,7 @@ module top #(
     fwdA_e fwdA;
     fwdB_e fwdB;
 
-    (* keep_hierarchy = "yes" *) fwd_unit u_fwd_unit(
+    fwd_unit u_fwd_unit(
         .rs1E(de_out.rs1_addr),
         .rs2E(de_out.rs2_addr),
         .rdM1(em_out.rd_addr),
@@ -341,7 +341,7 @@ module top #(
     end
 
     //Hazard Unit Logic:
-    (* keep_hierarchy = "yes" *) hzrd_unit u_hzrd_unit(
+    hzrd_unit u_hzrd_unit(
         .mem_readE(de_out.mem_read),
         .rs1D(rs1_addrD),
         .rs2D(rs2_addrD),

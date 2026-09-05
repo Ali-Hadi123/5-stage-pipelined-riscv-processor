@@ -376,10 +376,11 @@ module top #(
 
     logic [XLEN-1:0] pc_mux_outM;
 
-    mux3 #(.WIDTH(XLEN)) u_pc_mux(
+    mux4 #(.WIDTH(XLEN)) u_pc_mux(
         .a(pc_plus4F1),
         .b(em_out.pc_target),
         .c(em_out.alu_result),
+        .d('0),
         .sel(pc_srcM),
         .result(pc_mux_outM)
     );

@@ -201,7 +201,7 @@ module hazard_tb;
     //exercising the sequential "extra stall cycle" behavior below.
     clk_tick();
 
-    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b1, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 24: Load-use hazard + branch in decode (cycle 1)"); //Testing that a load-use hazard concurrent with a branch in decode behaves like an ordinary load-use hazard this cycle...
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b1, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b1, 1'b1, 1'b0, "Test 24: Load-use hazard + branch in decode (cycle 1)"); //Testing that a load-use hazard concurrent with a branch in decode behaves like an ordinary load-use hazard this cycle...
     clk_tick(); //...while also latching extra_stall_d (lw_stall & is_branchD) into extra_stall_q for next cycle.
 
     verify_hzrd(1'b0, 5'd9, 5'd9, 5'd9, 1'b0, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 25: Extra stall cycle held after load-use+branch (cycle 2)"); //Testing that even though lw_stall has cleared, extra_stall_q keeps stallF/stallD/flushE asserted for one more cycle.

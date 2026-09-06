@@ -57,28 +57,65 @@ module hazard_tb;
       );
   endtask
 
+  //---------------------------------------------------------------------
+  // Hazard unit signals
+  // hzrd_unit is now sequential (clk/rst driving an internal
+  // extra_stall_q flop) and has two new decode-stage inputs
+  // (is_branchD/is_jalrD) plus a new flushM output tied to
+  // branch_mispredict.
+  //---------------------------------------------------------------------
+  logic hzrd_clk, hzrd_rst;
   logic hzrd_mem_readE;
   logic [REG_ADDR_W-1:0] hzrd_rs1D, hzrd_rs2D, hzrd_rdE;
+  logic hzrd_is_branchD, hzrd_is_jalrD;
   pc_src_e hzrd_pc_srcM;
-  logic hzrd_stallF, hzrd_stallD, hzrd_flushD, hzrd_flushE;
+  logic hzrd_stallF, hzrd_stallD, hzrd_flushD, hzrd_flushE, hzrd_flushM;
 
   hzrd_unit duv_hzrd(
+    .clk(hzrd_clk),
+    .rst(hzrd_rst),
     .mem_readE(hzrd_mem_readE),
     .rs1D(hzrd_rs1D),
     .rs2D(hzrd_rs2D),
     .rdE(hzrd_rdE),
+    .is_branchD(hzrd_is_branchD),
+    .is_jalrD(hzrd_is_jalrD),
     .pc_srcM(hzrd_pc_srcM),
     .stallF(hzrd_stallF),
     .stallD(hzrd_stallD),
     .flushD(hzrd_flushD),
-    .flushE(hzrd_flushE)
+    .flushE(hzrd_flushE),
+    .flushM(hzrd_flushM)
   );
 
+  // The clock is only advanced explicitly via clk_tick(), never free
+  // running. That keeps verify_hzrd's combinational checks race-free
+  // (no hidden posedge can sneak in mid-check) and lets tests advance
+  // extra_stall_q only when they intend to exercise it.
+  initial hzrd_clk = 1'b0;
+
+  task clk_tick();
+    #5 hzrd_clk = 1'b1;
+    #5 hzrd_clk = 1'b0;
+  endtask
+
+  task reset_hzrd();
+    hzrd_rst = 1'b1;
+    clk_tick();
+    hzrd_rst = 1'b0;
+  endtask
+
+  // Applies an input combination and checks hzrd_unit's combinational
+  // outputs WITHOUT advancing the clock. extra_stall_q (and therefore
+  // any "extra cycle" stall/flush behavior) reflects whatever state was
+  // left by the last clk_tick() call - use clk_tick() explicitly between
+  // verify_hzrd calls to exercise the sequential element across cycles.
   task verify_hzrd(
     input logic mem_readE,
     input logic [REG_ADDR_W-1:0] rs1D, rs2D, rdE,
+    input logic is_branchD, is_jalrD,
     input pc_src_e pc_srcM,
-    input logic exp_stallF, exp_stallD, exp_flushD, exp_flushE,
+    input logic exp_stallF, exp_stallD, exp_flushD, exp_flushE, exp_flushM,
     input string test_name
   );
 
@@ -86,24 +123,27 @@ module hazard_tb;
     hzrd_rs1D = rs1D;
     hzrd_rs2D = rs2D;
     hzrd_rdE = rdE;
+    hzrd_is_branchD = is_branchD;
+    hzrd_is_jalrD = is_jalrD;
     hzrd_pc_srcM = pc_srcM;
 
-    #10;
+    #1;
 
     total_tests++;
 
     assert (
       hzrd_stallF === exp_stallF && hzrd_stallD === exp_stallD &&
-      hzrd_flushD === exp_flushD && hzrd_flushE === exp_flushE
+      hzrd_flushD === exp_flushD && hzrd_flushE === exp_flushE &&
+      hzrd_flushM === exp_flushM
     ) begin
       passed_tests++;
       $display("Passed: %s", test_name);
     end
     else
       $error(
-        "Failed: %s\nExpected stallF=%b stallD=%b flushD=%b flushE=%b\nGot stallF=%b stallD=%b flushD=%b flushE=%b",
-        test_name, exp_stallF, exp_stallD, exp_flushD, exp_flushE,
-        hzrd_stallF, hzrd_stallD, hzrd_flushD, hzrd_flushE
+        "Failed: %s\nExpected stallF=%b stallD=%b flushD=%b flushE=%b flushM=%b\nGot stallF=%b stallD=%b flushD=%b flushE=%b flushM=%b",
+        test_name, exp_stallF, exp_stallD, exp_flushD, exp_flushE, exp_flushM,
+        hzrd_stallF, hzrd_stallD, hzrd_flushD, hzrd_flushE, hzrd_flushM
       );
   endtask
 
@@ -115,14 +155,16 @@ module hazard_tb;
     fwd_rs1E = 0; fwd_rs2E = 0; fwd_rdM1 = 0; fwd_rdM2 = 0; fwd_rdW = 0;
     fwd_reg_writeM1 = 0; fwd_reg_writeM2 = 0; fwd_reg_writeW = 0;
 
+    hzrd_rst = 0;
     hzrd_mem_readE = 0;
     hzrd_rs1D = 0; hzrd_rs2D = 0; hzrd_rdE = 0;
+    hzrd_is_branchD = 0; hzrd_is_jalrD = 0;
     hzrd_pc_srcM = PC_PLUS4;
 
     #10;
 
     $display("STARTING HAZARD/FORWARDING UNIT TESTING:");
-    
+
     $display("FORWARDING TESTING:");
 
     verify_fwd(5'd1, 5'd2, 5'd3, 5'd4, 5'd6, 1'b1, 1'b1, 1'b1, FWD_NONE_A, FWD_NONE_B, "Test 1: No hazard, no forwarding"); //Testing that unrelated regs don't forward.
@@ -143,14 +185,37 @@ module hazard_tb;
 
     $display("HAZARD UNIT TESTING:");
 
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 16: No hazard, no stall/flush"); //Testing the default, no-hazard case.
-    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 17: Load-use hazard on rs1D"); //Testing a load-use hazard through rs1D stalls fetch/decode and flushes execute.
-    verify_hzrd(1'b1, 5'd2, 5'd6, 5'd6, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, "Test 18: Load-use hazard on rs2D"); //Testing a load-use hazard through rs2D.
-    verify_hzrd(1'b1, 5'd0, 5'd0, 5'd0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 19: Load-use hazard ignored for x0"); //Testing that a load-use hazard targeting x0 is ignored.
-    verify_hzrd(1'b1, 5'd1, 5'd2, 5'd9, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, "Test 20: mem_readE with no matching rs1D/rs2D"); //Testing that a load in EX with no dependent regs in ID causes no stall.
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_TARGET, 1'b0, 1'b0, 1'b1, 1'b1, "Test 21: Branch misprediction flushes D and E"); //Testing a taken branch (PC_TARGET) causes flushD and flushE, no stalling.
-    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, PC_RESULT, 1'b0, 1'b0, 1'b1, 1'b1, "Test 22: JALR misprediction flushes D and E"); //Testing PC_RESULT (JALR) also causes flushD and flushE.
-    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, PC_TARGET, 1'b1, 1'b1, 1'b1, 1'b1, "Test 23: Simultaneous load-use hazard and branch misprediction"); //Testing that both hazards together stall fetch/decode and flush both D and E.
+    reset_hzrd(); //Synchronously clear extra_stall_q before hazard testing begins.
+
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, 1'b0, 1'b0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, "Test 16: No hazard, no stall/flush"); //Testing the default, no-hazard case.
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b0, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 17: Load-use hazard on rs1D"); //Testing a load-use hazard through rs1D stalls fetch/decode and flushes execute.
+    verify_hzrd(1'b1, 5'd2, 5'd6, 5'd6, 1'b0, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 18: Load-use hazard on rs2D"); //Testing a load-use hazard through rs2D.
+    verify_hzrd(1'b1, 5'd0, 5'd0, 5'd0, 1'b0, 1'b0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, "Test 19: Load-use hazard ignored for x0"); //Testing that a load-use hazard targeting x0 is ignored.
+    verify_hzrd(1'b1, 5'd1, 5'd2, 5'd9, 1'b0, 1'b0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, "Test 20: mem_readE with no matching rs1D/rs2D"); //Testing that a load in EX with no dependent regs in ID causes no stall.
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, 1'b0, 1'b0, PC_TARGET, 1'b0, 1'b0, 1'b1, 1'b1, 1'b1, "Test 21: Branch misprediction flushes D, E, and M"); //Testing a taken branch (PC_TARGET) causes flushD, flushE, and flushM with no stalling.
+    verify_hzrd(1'b0, 5'd1, 5'd2, 5'd3, 1'b0, 1'b0, PC_RESULT, 1'b0, 1'b0, 1'b1, 1'b1, 1'b1, "Test 22: JALR misprediction flushes D, E, and M"); //Testing PC_RESULT (JALR) also causes flushD, flushE, and flushM.
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b0, 1'b0, PC_TARGET, 1'b1, 1'b1, 1'b1, 1'b1, 1'b1, "Test 23: Simultaneous load-use hazard and branch misprediction"); //Testing that both hazards together stall fetch/decode and flush D, E, and M.
+
+    //Getting extra_stall_q back to a known 0 state (is_branchD/is_jalrD
+    //were 0 for test 23's inputs, so extra_stall_d is 0 here) before
+    //exercising the sequential "extra stall cycle" behavior below.
+    clk_tick();
+
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b1, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 24: Load-use hazard + branch in decode (cycle 1)"); //Testing that a load-use hazard concurrent with a branch in decode behaves like an ordinary load-use hazard this cycle...
+    clk_tick(); //...while also latching extra_stall_d (lw_stall & is_branchD) into extra_stall_q for next cycle.
+
+    verify_hzrd(1'b0, 5'd9, 5'd9, 5'd9, 1'b0, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 25: Extra stall cycle held after load-use+branch (cycle 2)"); //Testing that even though lw_stall has cleared, extra_stall_q keeps stallF/stallD/flushE asserted for one more cycle.
+    clk_tick(); //extra_stall_d is 0 this cycle, so extra_stall_q clears on this edge.
+
+    verify_hzrd(1'b0, 5'd9, 5'd9, 5'd9, 1'b0, 1'b0, PC_PLUS4, 1'b0, 1'b0, 1'b0, 1'b0, 1'b0, "Test 26: Extra stall cycle clears once extra_stall_q returns to 0 (cycle 3)"); //Testing that the pipeline returns to normal once the latched extra stall has been consumed.
+
+    clk_tick(); //Confirming clean state before testing the JALR variant.
+
+    verify_hzrd(1'b1, 5'd5, 5'd2, 5'd5, 1'b0, 1'b1, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 27: Load-use hazard + JALR in decode (cycle 1)"); //Testing that is_jalrD triggers the same latched extra-stall behavior as is_branchD.
+    clk_tick();
+
+    verify_hzrd(1'b0, 5'd9, 5'd9, 5'd9, 1'b0, 1'b0, PC_PLUS4, 1'b1, 1'b1, 1'b0, 1'b1, 1'b0, "Test 28: Extra stall cycle held after load-use+JALR (cycle 2)"); //Testing that extra_stall_q holds the extra stall cycle for the JALR case too.
+    clk_tick(); //Leave the DUV in a clean, de-asserted state.
 
     $display("HAZARD/FORWARDING UNIT TESTING COMPLETE!");
     $display("Results: %0d/%0d tests passed.", passed_tests, total_tests);

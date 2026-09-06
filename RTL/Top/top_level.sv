@@ -223,7 +223,6 @@ module top #(
 
     assign fwd_dataM2 = (m1m2_out.result_src == RESULT_PCPLUS4)  ? m1m2_out.pc_plus4  :
                         (m1m2_out.result_src == RESULT_PCTARGET) ? m1m2_out.pc_target :
-                        (m1m2_out.result_src == RESULT_MEM) ? mem_read_dataM : 
                         m1m2_out.alu_result;
 
     logic [XLEN-1:0] fwd_rdata1E, fwd_rdata2E;
@@ -316,11 +315,15 @@ module top #(
 
     //Hazard Unit Logic:
     hzrd_unit u_hzrd_unit(
+        .clk(clk),
+        .rst(rst),
         .mem_readE(de_out.mem_read),
         .rs1D(rs1_addrD),
         .rs2D(rs2_addrD),
         .rdE(de_out.rd_addr),
         .pc_srcM(pc_srcM_hzrd),
+        .is_branchD(is_branchD),
+        .is_jalrD(is_jalrD),
         .stallF(stallF),
         .stallD(stallD),
         .flushD(flushD),

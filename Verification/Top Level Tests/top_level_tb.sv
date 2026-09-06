@@ -300,8 +300,8 @@ module top_tb;
       $error("Failed: illegal_instr asserted during prime sieve program run");
 
     for (int p = 0; p <= 100; p = p + 1) begin
-      automatic logic [XLEN-1:0] word;
-      automatic logic [7:0] got_byte, exp_byte;
+      logic [XLEN-1:0] word;
+      logic [7:0] got_byte, exp_byte;
 
       word = duv_prime.u_dmem.ram[p >> 2];
       got_byte = word[(8*(p % 4)) +: 8];

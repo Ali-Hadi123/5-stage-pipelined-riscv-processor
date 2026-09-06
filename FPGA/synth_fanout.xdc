@@ -6,5 +6,5 @@ set_property MAX_FANOUT 8 \
 set_property MAX_FANOUT 4 \
     [get_nets -hierarchical -filter {NAME =~ "*fwd_rdata1E*" || NAME =~ "*fwd_rdata2E*"}]
 
-set_property MAX_FANOUT 16 \
+set_property MAX_FANOUT 12 \
     [get_nets -hierarchical -filter {NAME =~ "*pc_srcM*" || NAME =~ "*halt_pc*"}]

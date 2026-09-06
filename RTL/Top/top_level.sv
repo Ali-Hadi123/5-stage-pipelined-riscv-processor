@@ -223,6 +223,7 @@ module top #(
 
     assign fwd_dataM2 = (m1m2_out.result_src == RESULT_PCPLUS4)  ? m1m2_out.pc_plus4  :
                         (m1m2_out.result_src == RESULT_PCTARGET) ? m1m2_out.pc_target :
+                        (m1m2_out.result_src == RESULT_MEM) ? mem_read_dataM : 
                         m1m2_out.alu_result;
 
     logic [XLEN-1:0] fwd_rdata1E, fwd_rdata2E;

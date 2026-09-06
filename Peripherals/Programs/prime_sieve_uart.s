@@ -1,16 +1,17 @@
 # Prime Sieve of Eratosthenes -> UART Demo
-# Computes all primes from 2 to 100 using the Sieve of Eratosthenes and
+# Computes all primes in (0, 100) using the Sieve of Eratosthenes and
 # prints each one in decimal (followed by CR/LF) over the memory-mapped
 # UART peripheral at address 0xFFFFFFF0 (-16). This core is RV32I only
-# (no M extension), so all multiplication is done with a repeated-addition
-# subroutine and all decimal conversion is done with repeated subtraction.
+# (no M extension), so multiplication (i*i) is done with a repeated-
+# addition subroutine and decimal conversion is done with repeated
+# subtraction (hundreds/tens/units).
 #
 # Memory map used in dmem:
 #   byte addresses 0..100  -> sieve[0..100], 1 = "still prime", 0 = "composite"
 #
 # Register map:
 #   x1  = ra (link register for all jal/jalr calls)
-#   x2  = constant 100 (sieve limit N, also used as the "hundreds" divisor)
+#   x2  = constant 100 (sieve limit N, also the "hundreds" divisor)
 #   x3  = i (loop counter, reused across phases)
 #   x4  = j (sieve inner-loop counter)
 #   x5  = scratch
@@ -32,35 +33,35 @@
 addi x2, x0, 100        # x2 = 100  (N, and the "hundreds" constant)
 addi x26, x0, 10        # x26 = 10  (the "tens" constant)
 addi x7, x0, -16        # x7 = UART_ADDR (0xFFFFFFF0)
-addi x12, x2, 1          # x12 = N + 1 = 101 (inclusive loop bound)
+addi x12, x2, 1         # x12 = N + 1 = 101 (inclusive loop bound)
 
 # ---- Initialize sieve[0..100] = 1 ----
-addi x5, x0, 1           # x5 = 1 (the "prime" flag)
-addi x3, x0, 0            # i = 0
+addi x5, x0, 1          # x5 = 1 (the "prime" flag)
+addi x3, x0, 0          # i = 0
 INIT_LOOP:
-sb x5, 0(x3)               # sieve[i] = 1
+sb x5, 0(x3)            # sieve[i] = 1
 addi x3, x3, 1
 blt x3, x12, INIT_LOOP
 
-sb x0, 0(x0)              # sieve[0] = 0 (not prime)
-sb x0, 1(x0)              # sieve[1] = 0 (not prime)
+sb x0, 0(x0)            # sieve[0] = 0 (not prime)
+sb x0, 1(x0)            # sieve[1] = 0 (not prime)
 
 # ---- Sieve of Eratosthenes ----
-addi x3, x0, 2             # i = 2
+addi x3, x0, 2          # i = 2
 SIEVE_OUTER:
-add x13, x3, x0            # a = i
-add x14, x3, x0            # b = i
-jal x1, MUL_FUNC             # x15 = i*i
+add x13, x3, x0         # a = i
+add x14, x3, x0         # b = i
+jal x1, MUL_FUNC        # x15 = i*i
 blt x2, x15, SIEVE_OUTER_DONE  # if N < i*i, stop (i*i > N)
 
-lbu x5, 0(x3)                # x5 = sieve[i]
-beq x5, x0, SIEVE_OUTER_NEXT # if not prime, skip marking
+lbu x5, 0(x3)           # x5 = sieve[i]
+beq x5, x0, SIEVE_OUTER_NEXT   # if not prime, skip marking
 
-add x4, x15, x0              # j = i*i
+add x4, x15, x0         # j = i*i
 SIEVE_INNER:
-blt x2, x4, SIEVE_INNER_DONE  # if N < j, done marking this i
-sb x0, 0(x4)                    # sieve[j] = 0
-add x4, x4, x3                  # j += i
+blt x2, x4, SIEVE_INNER_DONE   # if N < j, done marking this i
+sb x0, 0(x4)            # sieve[j] = 0
+add x4, x4, x3          # j += i
 jal x0, SIEVE_INNER
 SIEVE_INNER_DONE:
 
@@ -70,19 +71,19 @@ jal x0, SIEVE_OUTER
 SIEVE_OUTER_DONE:
 
 # ---- Print every remaining prime, each followed by CR LF ----
-addi x3, x0, 2               # i = 2
+addi x3, x0, 2          # i = 2
 PRINT_OUTER:
-bge x3, x12, PRINT_DONE       # loop while i <= N
+bge x3, x12, PRINT_DONE # loop while i <= N
 lbu x5, 0(x3)
-beq x5, x0, PRINT_NEXT          # not prime, skip
+beq x5, x0, PRINT_NEXT  # not prime, skip
 
-add x20, x3, x0                 # arg for PRINT_NUMBER
+add x20, x3, x0         # arg for PRINT_NUMBER
 jal x1, PRINT_NUMBER
 
-addi x24, x0, 13                # '\r'
+addi x24, x0, 13        # '\r'
 sw x24, 0(x7)
 jal x1, DELAY
-addi x24, x0, 10                 # '\n'
+addi x24, x0, 10        # '\n'
 sw x24, 0(x7)
 jal x1, DELAY
 
@@ -126,10 +127,10 @@ jalr x0, 0(x1)
 # suppressed, no trailing characters. Calls DELAY internally (which
 # uses x1), so it saves/restores its own return address in x28.
 PRINT_NUMBER:
-add x28, x1, x0              # save our return address
+add x28, x1, x0         # save our return address
 
-addi x21, x0, 0                # hundreds digit = 0
-add x22, x20, x0               # remaining = number
+addi x21, x0, 0         # hundreds digit = 0
+add x22, x20, x0        # remaining = number
 H_LOOP:
 blt x22, x2, H_DONE
 sub x22, x22, x2
@@ -137,22 +138,22 @@ addi x21, x21, 1
 jal x0, H_LOOP
 H_DONE:
 
-addi x23, x0, 0                 # tens digit = 0
+addi x23, x0, 0         # tens digit = 0
 T_LOOP:
 blt x22, x26, T_DONE
 sub x22, x22, x26
 addi x23, x23, 1
 jal x0, T_LOOP
 T_DONE:
-                                  # x22 is now the units digit
+                         # x22 is now the units digit
 
 beq x21, x0, SKIP_HUNDRED
-addi x24, x21, 48                 # ASCII '0'-'9'
+addi x24, x21, 48       # ASCII '0'-'9'
 sw x24, 0(x7)
 jal x1, DELAY
 SKIP_HUNDRED:
 
-bne x21, x0, PRINT_TENS_FORCE     # hundreds printed -> tens is mandatory
+bne x21, x0, PRINT_TENS_FORCE  # hundreds printed -> tens is mandatory
 beq x23, x0, SKIP_TENS
 PRINT_TENS_FORCE:
 addi x24, x23, 48
@@ -160,8 +161,8 @@ sw x24, 0(x7)
 jal x1, DELAY
 SKIP_TENS:
 
-addi x24, x22, 48                  # units digit always prints
+addi x24, x22, 48       # units digit always prints
 sw x24, 0(x7)
 jal x1, DELAY
 
-jalr x0, 0(x28)                    # return to caller
+jalr x0, 0(x28)         # return to caller

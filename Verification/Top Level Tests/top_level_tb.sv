@@ -16,7 +16,35 @@ module top_tb;
   int unsigned total_tests_load_store, passed_tests_load_store;
   int unsigned total_tests_upper_immediate, passed_tests_upper_immediate;
 
+  function automatic bit is_prime_ref(input int n);
+    int d;
+    begin
+      if (n < 2) return 1'b0;
+      for (d = 2; d*d <= n; d = d + 1)
+        if (n % d == 0) return 1'b0;
+      return 1'b1;
+    end
+  endfunction
+
   always #5 clk = ~clk;
+
+  int unsigned total_tests_prime, passed_tests_prime;
+  logic illegal_instr_prime;
+  logic [XLEN-1:0] prime_mem_addr, prime_mem_wdata;
+  logic prime_mem_write;
+
+  top #(
+    .ram_size(1024),
+    .rom_size(80),
+    .init_mem("../../Peripherals/Programs/prime_sieve_uart.hex")
+  ) duv_prime (
+    .clk(clk),
+    .rst(rst),
+    .illegal_instr(illegal_instr_prime),
+    .fpga_mem_addr(prime_mem_addr),
+    .fpga_mem_wdata(prime_mem_wdata),
+    .fpga_mem_write(prime_mem_write)
+  );
 
   top #(
     .ram_size(1024),
@@ -254,6 +282,46 @@ module top_tb;
 
     $display("ALL TESTING IS DONE!");
     $display("RESULTS: %0d/%0d tests passed!", passed_tests, total_tests);
+
+        repeat (30000) @(posedge clk);
+    #1;
+
+    $display("STARTING PRIME SIEVE TESTING:\n");
+
+    total_tests_prime = 0;
+    passed_tests_prime = 0;
+
+    total_tests_prime++;
+    if (illegal_instr_prime === 1'b0) begin
+      passed_tests_prime++;
+      $display("Passed: No illegal instruction during prime sieve run");
+    end
+    else
+      $error("Failed: illegal_instr asserted during prime sieve program run");
+
+    for (int p = 0; p <= 100; p = p + 1) begin
+      automatic logic [XLEN-1:0] word;
+      automatic logic [7:0] got_byte, exp_byte;
+
+      word = duv_prime.u_dmem.ram[p >> 2];
+      got_byte = word[(8*(p % 4)) +: 8];
+      exp_byte = is_prime_ref(p) ? 8'd1 : 8'd0;
+
+      total_tests_prime++;
+      if (got_byte === exp_byte) begin
+        passed_tests_prime++;
+        $display("Passed: SIEVE[%0d] = %0d", p, got_byte);
+      end
+      else
+        $error("Failed: SIEVE[%0d]\nExpected: %0d\nGot: %0d", p, exp_byte, got_byte);
+    end
+
+    total_tests  = total_tests  + total_tests_prime;
+    passed_tests = passed_tests + passed_tests_prime;
+
+    $display("\nTESTING COMPLETED\nResults: %0d/%0d tests passed.", passed_tests_prime, total_tests_prime);
+    $display("\nPRIME SIEVE TESTING COMPLETED.\n");
+
     $finish;
   end
 endmodule

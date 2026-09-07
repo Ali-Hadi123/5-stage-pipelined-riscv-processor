@@ -21,7 +21,7 @@ written in SystemVerilog.
 
 ![Alt Text](Demo/fibonacci_demo.gif)
 
-^Gif of CPU synthesized onto a FPGA (Basys3) calculating the first 50 terms of the Fibanocci sequence and transmitting them via UART (see `Peripherals/Programs/fibonacci_uart.s`).
+Gif of CPU synthesized onto a FPGA (Basys3) calculating the first 50 terms of the Fibanocci sequence and transmitting them via UART (see `Peripherals/Programs/fibonacci_uart.s`).
 
 ## Project Structure
 
@@ -154,10 +154,10 @@ chmod +x "Verification/ArchTests/run_act4_tests.sh"
 "Verification/ArchTests/run_act4_tests.sh" /path/to/riscv-arch-test
 ```
 
-## Future Improvements and Extentions
+## Future Improvements & Extensions
 
 - Official RISCV ACT4 test support and verification
-- M-extention (multiply and divide)
-- CSR and Trap handling
+- M-extension (multiply and divide)
+- Full CRS and Trap handling
 - UART Rx peripheral
 - FIFO buffer for peripherals

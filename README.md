@@ -13,13 +13,14 @@ written in SystemVerilog.
     - Running a Sieve of Eratosthenes algorithim program to find all prime numbers <100.
 
 - Fully synthesized on physical FPGA (Basys 3 AMD Artix™ 7) with AMD's Vivado design suite.
-    - F<sub>max<sub> = 100 MHz
+    - F<sub>max</sub> = 100 MHz
 
 - Functioning memory-mapped UART Tx peripheral.
 
 - Demo Video:
 
 ![Alt Text](Demo/fibonacci_demo.gif)
+Gif of CPU synthesized onto a FPGA (Basys3) calculating the first 50 terms of the Fibanocci sequence and transmitting them via UART (see `Peripherals/Programs/fibonacci_uart.s`).
 
 ## Project Structure
 
@@ -154,6 +155,7 @@ chmod +x "Verification/ArchTests/run_act4_tests.sh"
 
 ## Future Improvements and Extentions
 
+- Official RISCV ACT4 test support and verification
 - M-extention (multiply and divide)
 - CSR and Trap handling
 - UART Rx peripheral

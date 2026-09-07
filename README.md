@@ -17,10 +17,11 @@ written in SystemVerilog.
 
 - Functioning memory-mapped UART Tx peripheral.
 
-- Demo Video:
+- Demo Gif:
 
 ![Alt Text](Demo/fibonacci_demo.gif)
-Gif of CPU synthesized onto a FPGA (Basys3) calculating the first 50 terms of the Fibanocci sequence and transmitting them via UART (see `Peripherals/Programs/fibonacci_uart.s`).
+
+^Gif of CPU synthesized onto a FPGA (Basys3) calculating the first 50 terms of the Fibanocci sequence and transmitting them via UART (see `Peripherals/Programs/fibonacci_uart.s`).
 
 ## Project Structure
 

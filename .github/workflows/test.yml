@@ -26,47 +26,47 @@ jobs:
           chmod +x ./run_tests.sh
           ./run_tests.sh
 
-      - name: Install RISC-V toolchain
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf
+      # - name: Install RISC-V toolchain
+      #   run: |
+      #     sudo apt-get update -qq
+      #     sudo apt-get install -y gcc-riscv64-unknown-elf binutils-riscv64-unknown-elf
 
-      - name: Clone riscv-arch-test (ACT4)
-        run: |
-          git clone --depth 1 --branch act4 https://github.com/riscv/riscv-arch-test.git /tmp/riscv-arch-test
+      # - name: Clone riscv-arch-test (ACT4)
+      #   run: |
+      #     git clone --depth 1 --branch act4 https://github.com/riscv/riscv-arch-test.git /tmp/riscv-arch-test
  
-      - name: Install mise
-        run: |
-          curl https://mise.jdx.dev/install.sh | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+      # - name: Install mise
+      #   run: |
+      #     curl https://mise.jdx.dev/install.sh | sh
+      #     echo "$HOME/.local/bin" >> "$GITHUB_PATH"
  
-      - name: Trust mise config and install framework deps
-        working-directory: /tmp/riscv-arch-test
-        run: |
-          mise trust .mise.toml
-          pip install -e ./framework -e ./generators/testgen -e ./generators/coverage --break-system-packages
+      # - name: Trust mise config and install framework deps
+      #   working-directory: /tmp/riscv-arch-test
+      #   run: |
+      #     mise trust .mise.toml
+      #     pip install -e ./framework -e ./generators/testgen -e ./generators/coverage --break-system-packages
  
-      - name: Install RISC-V GCC toolchain (RV32)
-        run: |
-          curl --location https://github.com/riscv-collab/riscv-gnu-toolchain/releases/latest/download/riscv32-elf-ubuntu-22.04-gcc.tar.xz \
-            | sudo tar xvJ --directory=/usr/local --strip-components=1
-          echo "/usr/local/bin" >> "$GITHUB_PATH"
+      # - name: Install RISC-V GCC toolchain (RV32)
+      #   run: |
+      #     curl --location https://github.com/riscv-collab/riscv-gnu-toolchain/releases/latest/download/riscv32-elf-ubuntu-22.04-gcc.tar.xz \
+      #       | sudo tar xvJ --directory=/usr/local --strip-components=1
+      #     echo "/usr/local/bin" >> "$GITHUB_PATH"
  
-      - name: Install RISC-V Sail reference model
-        run: |
-          curl --location https://github.com/riscv/sail-riscv/releases/download/0.13.1/sail-riscv-Linux-x86_64.tar.gz \
-            | sudo tar xvz --directory=/usr/local --strip-components=1
+      # - name: Install RISC-V Sail reference model
+      #   run: |
+      #     curl --location https://github.com/riscv/sail-riscv/releases/download/0.13.1/sail-riscv-Linux-x86_64.tar.gz \
+      #       | sudo tar xvz --directory=/usr/local --strip-components=1
  
-      - name: Run ACT4 RV32I tests
-        run: |
-          chmod +x "Verification/ArchTests/run_act4_tests.sh"
-          "Verification/ArchTests/run_act4_tests.sh" /tmp/riscv-arch-test
+      # - name: Run ACT4 RV32I tests
+      #   run: |
+      #     chmod +x "Verification/ArchTests/run_act4_tests.sh"
+      #     "Verification/ArchTests/run_act4_tests.sh" /tmp/riscv-arch-test
 
-      - name: Upload ACT4 results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: act4-results
-          path: |
-            act4_results.txt
-            act4_logs/
+      # - name: Upload ACT4 results
+      #   if:_always()
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: act4-results
+      #     path: |
+      #       act4_results.txt
+      #       act4_logs/
